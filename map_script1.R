@@ -1,8 +1,19 @@
 library(readr)
 library(ggplot2)
 library(sf)
+library(SWMPr)
+
+codes <- SWMPr::site_codes() %>% ## Get sites
+  dplyr::filter(state == c("me", "nh", "ma", "ri")) %>% # only New England sites
+  dplyr::mutate(latitude = as.numeric(latitude), 
+                longitude = as.numeric(longitude)*-1) # put in the correct hemisphere
+
+site_labels <- codes %>% 
+  group_by(reserve_name) %>% 
+  slice(1) # selects one station in each site
+
 #install.packages("maps")
-coordmap <- read_csv("coordmap.csv")
+#coordmap <- read_csv("coordmap.csv")
 
 # Map set up 
 # Set lat/lon window for maps
@@ -18,15 +29,18 @@ m <- ggplot()+
   #geom_polygon(aes(long, lat, group = group), data = map_data("usa"))+
   ggplot2::geom_sf(data = ecodata::coast) +
   ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
-  geom_point(aes(lon, lat), data = coordmap, color = "blue")#+
+  geom_point(aes(longitude, latitude), data = codes, color = "blue")+
+  geom_label(data = site_labels, aes( longitude, latitude, label = reserve_name), ## Adds site labels 
+             size = 3, fontface = "bold", nudge_y = 0.18) 
 #coord_quickmap(xlim = range(coordmap$lon) +c(-2,2), ylim = range(range(coordmap$lat) +c(-1,1)))
 
 #Change labels
 xbreaks <- seq(-72, -69, 1)
-ybreaks <- pretty(coordmap$lat)
+ybreaks <- pretty(codes$latitude)
 xlabels <- paste0(abs(xbreaks), "°W")
 ylabels <- paste0(abs(ybreaks), "°N")
 #Title and stuff
 m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+ 
   scale_y_continuous(breaks = ybreaks, labels = ylabels)+ 
   labs(x = NULL, y = NULL, title = "NERRS")
+

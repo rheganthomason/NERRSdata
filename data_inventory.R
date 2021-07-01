@@ -5,10 +5,36 @@ install.packages('SWMPr')
 
 # Library packages
 library(SWMPr)
+library(tidyverse)
 
 # get list of site codes 
 codes <- SWMPr::site_codes()
 
-View(codes)
 
-# more to come later
+# filter for relevant states
+codes <- codes %>% 
+  dplyr::filter(state == c("me", "nh", "ma", "ri"))
+
+# download data
+narpc <- all_params_dtrng("narpcnut", c('01/01/2010', '12/31/2020'))
+narts <- all_params_dtrng("nartsnut", c('01/01/2010', '12/31/2020'))
+
+# Wrangle data
+narpc2 <- narpc %>%  mutate_if(is.character,as.numeric) %>% 
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
+  tidyr::drop_na(Value) %>% 
+  mutate(station = c("PottersCove"))
+
+narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
+  tidyr::drop_na(Value) %>% 
+  mutate(station = c("TWharfSurface"))
+
+nar<- rbind(narpc2, narts2)
+
+# dirty plot
+nar %>% 
+  ggplot(aes(x = datetimestamp, y = Value))+
+  geom_point()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett Stations")
