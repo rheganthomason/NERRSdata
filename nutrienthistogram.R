@@ -1,5 +1,7 @@
 ## Nutrient histograms (norm, log)
+
 library(tidyverse)
+
 # Wrangle data
 narpc2 <- narpc %>%  mutate_if(is.character,as.numeric) %>% 
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
