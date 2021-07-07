@@ -45,7 +45,6 @@ nar %>%
   facet_grid(Variable~station, scales = "free")+
   ggtitle("Narragansett Stations")
 
-
 nar2 <- nar %>% mutate(month = lubridate::month(datetimestamp)) %>%
   group_by(month, Variable, station) %>% summarise(Climatology = mean(Value)) %>% 
   ungroup() 
@@ -54,5 +53,3 @@ nar3 <- nar %>% mutate(month = lubridate::month(datetimestamp),
                        year = lubridate::year(datetimestamp)) %>% 
   group_by(month, Variable, station) %>% mutate(Climatology = mean(Value)) %>% 
   mutate(anom = Value - Climatology) %>% ungroup()
-
-

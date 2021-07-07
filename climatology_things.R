@@ -1,6 +1,6 @@
 ## Time series/Climatology
 
-#for chlorophyll
+#for chlorophyll climo
 nar2 %>% dplyr::filter(nar2$Variable == "chla_n") %>% 
   ggplot(aes(x = month, y = Climatology))+
   geom_point()+
@@ -8,6 +8,7 @@ nar2 %>% dplyr::filter(nar2$Variable == "chla_n") %>%
   facet_grid(~station, scales = "free")+
   ggtitle("Narragansett - Chlorophyll")
 
+#anoms 
 nar3help<- nar3 %>% dplyr::filter(Variable == "chla_n") %>% 
   filter(month == "1") %>% group_by(year, station) %>% 
   summarise(anom.mean = mean(anom)) %>% ungroup()
@@ -18,4 +19,3 @@ nar3 %>% dplyr::filter(Variable == "chla_n") %>% filter(month == "1") %>%
              color = "red", shape = 3, size = 3)+
   facet_grid(month~station, scales = "free")+
   ggtitle("Narragansett - Chlorophyll")
-

@@ -2,6 +2,7 @@ library(readr)
 library(ggplot2)
 library(sf)
 library(SWMPr)
+library(tidyverse)
 
 codes <- SWMPr::site_codes() %>% ## Get sites
   dplyr::filter(state == c("me", "nh", "ma", "ri")) %>% # only New England sites
@@ -29,7 +30,7 @@ m <- ggplot()+
   #geom_polygon(aes(long, lat, group = group), data = map_data("usa"))+
   ggplot2::geom_sf(data = ecodata::coast) +
   ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
-  geom_point(aes(longitude, latitude), data = codes, color = "blue")+
+  geom_point(aes(longitude, latitude), data = codes, color = "midnightblue")+
   geom_label(data = site_labels, aes( longitude, latitude, label = reserve_name), ## Adds site labels 
              size = 3, fontface = "bold", nudge_y = 0.18) 
 #coord_quickmap(xlim = range(coordmap$lon) +c(-2,2), ylim = range(range(coordmap$lat) +c(-1,1)))
@@ -42,5 +43,4 @@ ylabels <- paste0(abs(ybreaks), "°N")
 #Title and stuff
 m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+ 
   scale_y_continuous(breaks = ybreaks, labels = ylabels)+ 
-  labs(x = NULL, y = NULL, title = "NERRS")
-
+  labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
