@@ -2,11 +2,14 @@
 
 #for chlorophyll climo
 nar2 %>% dplyr::filter(nar2$Variable == "chla_n") %>% 
-  ggplot(aes(x = month, y = Climatology))+
+  ggplot(aes(x = month, y = Climatology, group = "1"))+
   geom_point()+
   geom_line()+
-  facet_grid(~station, scales = "free")+
-  ggtitle("Narragansett - Chlorophyll")
+  geom_errorbar(aes(ymin=Climatology-clim.sd, ymax=Climatology+clim.sd), width=.2,
+                position=position_dodge(0.05), color = "steelblue")+
+  #facet_grid(~station, scales = "free")+
+  labs(x = element_blank(), y = "Chlorophyll (μg/L)")+
+  ggtitle("Narragansett - Climatology")
 
 #anoms 
 nar3help<- nar3 %>% dplyr::filter(Variable == "chla_n") %>% 
@@ -17,5 +20,7 @@ nar3 %>% dplyr::filter(Variable == "chla_n") %>% filter(month == "1") %>%
   geom_point()+
   geom_point(nar3help, mapping = aes(x = year, y = anom.mean), 
              color = "red", shape = 3, size = 3)+
+  geom_hline(aes(yintercept = 1), color = "steelblue", size = 2)+
   facet_grid(month~station, scales = "free")+
+  labs(x = "Year", y = "Chlorophyll Anomaly (ratio)")+
   ggtitle("Narragansett - Chlorophyll")
