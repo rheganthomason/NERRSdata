@@ -27,7 +27,8 @@ narts.temp.daily<- narts %>%
   select(datetimestamp, temp, f_temp)%>%
   mutate_if(is.character,as.numeric) %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0 ) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value ==c(1,2,4)) %>%
   pivot_wider(names_from = Variable, values_from = Value) %>%
   drop_na() %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
@@ -53,7 +54,8 @@ narts.dopct.daily<- narts %>%
   select(datetimestamp, do_pct, f_do_pct)%>%
   mutate_if(is.character,as.numeric) %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0 ) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value ==c(1,2,4)) %>%
   pivot_wider(names_from = Variable, values_from = Value) %>%
   drop_na() %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
@@ -73,7 +75,8 @@ narts.domgl.daily<- narts %>%
   select(datetimestamp, do_mgl, f_do_mgl)%>%
   mutate_if(is.character,as.numeric) %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0 ) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value ==c(1,2,4)) %>%
   pivot_wider(names_from = Variable, values_from = Value) %>%
   drop_na() %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
@@ -93,7 +96,8 @@ narts.turb.daily<- narts %>%
   select(datetimestamp, turb, f_turb)%>%
   mutate_if(is.character,as.numeric) %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0 ) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value ==c(1,2,4)) %>%
   pivot_wider(names_from = Variable, values_from = Value) %>%
   drop_na() %>%
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
@@ -109,7 +113,28 @@ narts.turb.daily<- narts %>%
          upper_ci = mean_daily + sd_daily,
          lower_ci = mean_daily - sd_daily)
 
-narts.daily<- rbind(narts.domgl.daily, narts.dopct.daily, narts.temp.daily, narts.turb.daily)
+narts.sal.daily<- narts %>%
+  select(datetimestamp, sal, f_sal)%>%
+  mutate_if(is.character,as.numeric) %>%
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value < 0) %>%
+  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value ==c(1,2,4)) %>%
+  pivot_wider(names_from = Variable, values_from = Value) %>%
+  drop_na() %>%
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>%
+  mutate(date = as.Date(datetimestamp)) %>%
+  group_by(date, Variable) %>%
+  summarise(mean_daily = mean(Value, na.rm=TRUE),
+            sd_daily  = sd(Value)) %>%
+  filter(!str_detect(Variable, "f_")) %>%
+  dplyr::mutate(station = c("TWsurface")) %>%
+  ungroup() %>%
+  mutate(month = lubridate::month(date),
+         year = lubridate::year(date),
+         upper_ci = mean_daily + sd_daily,
+         lower_ci = mean_daily - sd_daily)
+
+narts.daily<- rbind(narts.domgl.daily, narts.dopct.daily, narts.temp.daily, narts.turb.daily, narts.sal.daily)
 write.csv(narts.daily, file = "data/nartsdaily.csv")
 # get heatwave date set
 nar_hw<- narts.temp.daily %>% 
@@ -137,34 +162,4 @@ narts.monthly %>%
   geom_line()+
   geom_ribbon( aes(ymin = lower_ci, ymax = upper_ci ), alpha = 0.5)+
   facet_wrap(~Variable)
-
-
-narpc2 <- narpc %>%  mutate_if(is.character,as.numeric) %>% 
-  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
-  mutate(date = as.Date(datetimestamp)) %>% 
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value == c(0, 1,2, 3, 4, 5) ) %>% 
-  tidyr::drop_na(Value) %>% 
-  group_by(date, Variable) %>% 
-  summarise(mean = mean(Value, na.rm=TRUE), 
-            sd = sd(Value)) %>% 
-  filter(!str_detect(Variable, "f_")) %>% 
-  dplyr::mutate(station = c("PottersCove"))
-  
-
-narpc2 <- narpc %>%  mutate_if(is.character,as.numeric) %>% 
-  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
-  mutate(date = as.Date(datetimestamp)) %>% 
-  dplyr::filter(!Variable == str_detect(Variable, "f_") &  !Value == c(0, 1,2, 3, 4, 5) ) %>% 
-  tidyr::drop_na(Value) %>% 
-  group_by(date, Variable) %>% 
-  summarise(mean_daily = mean(Value, na.rm=TRUE), 
-            sd_daily  = sd(Value)) %>% 
-  filter(!str_detect(Variable, "f_")) %>% 
-  dplyr::mutate(station = c("TWsurface"))
-
-nar<- rbind(narpc2, narts2)
-
-narpc2 %>% filter(Variable == "temp") %>% 
-  ggplot(aes(x = datetimestamp, y = Value))+
-  geom_point()
 
