@@ -1,3 +1,14 @@
 # Documentation
 
 testing 1 2 this is for documentation
+
+## Daily DO 
+Can i see thisssss?
+
+nartsdaily %>% 
+filter(Variable == "do_mgl") %>% filter(year >= 2020) %>% 
+ggplot(aes(x = date, y = mean_daily))+
+geom_point()+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "gray")+
+labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset Dissolved Oxygen")+
+ecodata::theme_ts()
