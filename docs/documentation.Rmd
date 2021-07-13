@@ -4,7 +4,7 @@ testing 1 2 this is for documentation
 
 ## Daily DO 
 Can i see thisssss?
-
+```{r}
 nartsdaily %>% 
 filter(Variable == "do_mgl") %>% filter(year >= 2020) %>% 
 ggplot(aes(x = date, y = mean_daily))+
