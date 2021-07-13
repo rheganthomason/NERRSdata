@@ -172,13 +172,13 @@ narts.monthly %>%
   geom_point()+
   geom_line()+
   geom_ribbon( aes(ymin = lower_ci, ymax = upper_ci ), alpha = 0.5)+
-  facet_wrap(~Variable)
+  facet_wrap(~Variable) 
 
 #############################
 ## GREAT BAY
-grb20_15 <- all_params_dtrng("nartswq", c('01/01/2015', '12/31/2020'))
-grb14_09 <- all_params_dtrng("nartswq", c('01/01/2009', '12/31/2014'))
-grb08_04 <- all_params_dtrng("nartswq", c('01/01/2004', '12/31/2008'))
+grb20_15 <- all_params_dtrng("grbgbwq", c('01/01/2015', '12/31/2020'))
+grb14_09 <- all_params_dtrng("grbgbwq", c('01/01/2009', '12/31/2014'))
+grb08_04 <- all_params_dtrng("grbgbwq", c('01/01/2004', '12/31/2008'))
 grb03_96 <- all_params_dtrng("grbgbwq", c('01/01/1996', '12/31/2003'))
 
 # Bind 15 min data
@@ -201,7 +201,7 @@ grb.temp.daily<- grb %>%
   summarise(mean_daily = mean(Value, na.rm=TRUE),
             sd_daily  = sd(Value)) %>%
   filter(!str_detect(Variable, "f_")) %>%
-  dplyr::mutate(station = c("GreatBay")) %>%
+  dplyr::mutate(station = c("GRB")) %>%
   ungroup() %>%
   mutate(month = lubridate::month(date),
          year = lubridate::year(date),
@@ -230,7 +230,7 @@ grb.dopct.daily<- grb %>%
   summarise(mean_daily = mean(Value, na.rm=TRUE),
             sd_daily  = sd(Value)) %>%
   filter(!str_detect(Variable, "f_")) %>%
-  dplyr::mutate(station = c("GreatBay")) %>%
+  dplyr::mutate(station = c("GRB")) %>%
   ungroup() %>%
   mutate(month = lubridate::month(date),
          year = lubridate::year(date),
@@ -253,7 +253,7 @@ grb.domgl.daily<- grb %>%
   summarise(mean_daily = mean(Value, na.rm=TRUE),
             sd_daily  = sd(Value)) %>%
   filter(!str_detect(Variable, "f_")) %>%
-  dplyr::mutate(station = c("GreatBay")) %>%
+  dplyr::mutate(station = c("GRB")) %>%
   ungroup() %>%
   mutate(month = lubridate::month(date),
          year = lubridate::year(date),
@@ -276,7 +276,7 @@ grb.turb.daily<- grb %>%
   summarise(mean_daily = mean(Value, na.rm=TRUE),
             sd_daily  = sd(Value)) %>%
   filter(!str_detect(Variable, "f_")) %>%
-  dplyr::mutate(station = c("GreatBay")) %>%
+  dplyr::mutate(station = c("GRB")) %>%
   ungroup() %>%
   mutate(month = lubridate::month(date),
          year = lubridate::year(date),
@@ -299,7 +299,7 @@ grb.sal.daily<- grb %>%
   summarise(mean_daily = mean(Value, na.rm=TRUE),
             sd_daily  = sd(Value)) %>%
   filter(!str_detect(Variable, "f_")) %>%
-  dplyr::mutate(station = c("GreatBay")) %>%
+  dplyr::mutate(station = c("GRB")) %>%
   ungroup() %>%
   mutate(month = lubridate::month(date),
          year = lubridate::year(date),
@@ -325,7 +325,7 @@ grb.monthly <- grb.daily %>%
             sd_monthly = sd(mean_daily), 
             upper_ci = mean_monthly + sd_monthly, 
             lower_ci = mean_monthly - sd_monthly) %>%
-  mutate(station = c("GreatBay"))
+  mutate(station = c("GRB"))
 
 #write.csv(narts.monthly, file = "data/nartsmonthly.csv")
 
