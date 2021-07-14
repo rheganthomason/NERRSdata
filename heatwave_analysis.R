@@ -13,7 +13,7 @@ raw.dir <- here::here("data")
 narts_heatwave_csv<-"nar_heatwave.csv"
 
   
-nar2<-read_csv(file.path(raw.dir,narts_heatwave_csv),
+nar.heatwave<-read_csv(file.path(raw.dir,narts_heatwave_csv),
               col_types = cols(temp = col_double(),t = col_date()))
   # gb<-read_csv(file.path(raw.dir,heatwave_gb_csv),
   #              col_types = cols(temp = col_double(),t = col_date()))
@@ -22,7 +22,7 @@ nar2<-read_csv(file.path(raw.dir,narts_heatwave_csv),
   
   
   # Narragansett
-ts <- heatwaveR::ts2clm(nar2, climatologyPeriod = c("2004-01-01", "2019-12-31"))
+ts <- heatwaveR::ts2clm(nar.heatwave, climatologyPeriod = c("2004-01-01", "2019-12-31"))
 nar.mhw <- heatwaveR::detect_event(ts)
   
 mhw<- nar.mhw$clim %>%

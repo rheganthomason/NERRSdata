@@ -1,14 +1,151 @@
 # Documentation
 
-testing 1 2 this is for documentation
+## Narraganset (Daily) {.tabset}
 
-## Daily DO 
-Can i see thisssss?
-```{r}
+### Dissolved Oygen
+For milligrams per liter:
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(tidyverse)
+obj <- read.csv(here::here("data/daily_wq.csv"))
+nartsdaily <- obj %>% filter(station == "NAR") %>% 
+  mutate(date = as.Date(date))
+
+nartsdaily %>% 
+filter(Variable == "do_mgl") %>% filter(year >= 2007) %>% 
+ggplot(aes(x = date, y = mean_daily))+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)") +
+scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+ecodata::theme_ts()
+
 nartsdaily %>% 
 filter(Variable == "do_mgl") %>% filter(year >= 2020) %>% 
 ggplot(aes(x = date, y = mean_daily))+
-geom_point()+
-geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "gray")+
-labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset Dissolved Oxygen")+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "2020 Data") +
 ecodata::theme_ts()
+```
+
+For percent saturation:
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(tidyverse)
+obj <- read.csv(here::here("data/daily_wq.csv"))
+nartsdaily <- obj %>% filter(station == "NAR") %>% 
+mutate(date = as.Date(date))
+
+nartsdaily %>% filter(Variable == "do_pct") %>% filter(year >= 2007) %>%
+ggplot(aes(x = date, y = mean_daily))+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue")+
+geom_line(color = "steelblue")+
+labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)")+
+scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+ecodata::theme_ts()
+
+nartsdaily %>% filter(Variable == "do_pct") %>% filter(year >= 2020) %>%
+ggplot(aes(x = date, y = mean_daily))+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue")+
+geom_line(color = "steelblue")+
+scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 Data")+
+ecodata::theme_ts()
+```
+
+### Temperature
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+nartsdaily %>% filter(Variable == "temp") %>% filter(year >= 2007) %>%
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Temperature (°C)")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ecodata::theme_ts()
+
+nartsdaily %>% filter(Variable == "temp") %>% filter(year >= 2020) %>%
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (°C)", title = "2020 Data")+
+  ecodata::theme_ts()
+
+```
+
+## Great Bay (Daily) {.tabset}
+
+### Dissolved Oxygen 
+Milligram per liter:
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(tidyverse)
+grbdaily <- obj %>% filter(station == "GRB") %>% 
+mutate(date = as.Date(date))
+
+grbdaily %>% 
+filter(Variable == "do_mgl") %>% filter(year >= 2007) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ecodata::theme_ts()
+
+grbdaily %>% 
+filter(Variable == "do_mgl") %>% filter(year >= 2020) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L", title = "2020 Data")+
+  ecodata::theme_ts()
+```
+
+For percent saturation:
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(tidyverse)
+obj <- read.csv(here::here("data/daily_wq.csv"))
+grbdaily <- obj %>% filter(station == "GRB") %>% 
+mutate(date = as.Date(date))
+
+grbdaily %>% filter(Variable == "do_pct") %>% filter(year >= 2007) %>%
+ggplot(aes(x = date, y = mean_daily))+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue")+
+geom_line(color = "steelblue")+
+labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)")+
+scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+ecodata::theme_ts()
+
+grbdaily %>% filter(Variable == "do_pct") %>% filter(year >= 2020) %>%
+ggplot(aes(x = date, y = mean_daily))+
+geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue")+
+geom_line(color = "steelblue")+
+scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 Data")+
+ecodata::theme_ts()
+```
+
+### Temperature
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+grbdaily %>% filter(Variable == "temp") %>% filter(year >= 2007) %>%
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Temperature (°C)")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ecodata::theme_ts()
+
+grbdaily %>% filter(Variable == "temp") %>% filter(year >= 2020) %>%
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (°C)", title = "2020 Data")+
+  ecodata::theme_ts()
+```

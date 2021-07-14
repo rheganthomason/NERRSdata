@@ -3,6 +3,7 @@
 #for chlorophyll climo
 nar2 %>% dplyr::filter(nar2$Variable == "chla_n") %>% 
   ggplot(aes(x = month, y = Climatology, group = "1"))+
+  ecodata::theme_ts()+
   geom_point()+
   geom_line()+
   geom_errorbar(aes(ymin=Climatology-clim.sd, ymax=Climatology+clim.sd), width=.2,
@@ -17,6 +18,7 @@ nar3help<- nar3 %>% dplyr::filter(Variable == "chla_n") %>%
   summarise(anom.mean = mean(anom)) %>% ungroup()
 nar3 %>% dplyr::filter(Variable == "chla_n") %>% filter(month == "1") %>% 
   ggplot(aes(x = year, y = anom))+
+  ecodata::theme_ts()+
   geom_point()+
   geom_point(nar3help, mapping = aes(x = year, y = anom.mean), 
              color = "red", shape = 3, size = 3)+
