@@ -76,6 +76,27 @@ nartsdaily %>% filter(Variable == "temp") %>% filter(year >= 2020) %>%
 
 ```
 
+### Salinity 
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+nartsdaily %>% 
+  filter(Variable == "sal") %>% filter(year >= 2007) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Salinity Concentration (psu)", title = "") +
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ecodata::theme_ts()
+
+nartsdaily %>% 
+  filter(Variable == "sal") %>% filter(year >= 2020) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Salinity Concentration (psu)", title = "2020 Data") +
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ecodata::theme_ts()
+```
+
 ## Great Bay (Daily) {.tabset}
 
 ### Dissolved Oxygen 
@@ -147,5 +168,27 @@ grbdaily %>% filter(Variable == "temp") %>% filter(year >= 2020) %>%
   geom_line(color = "steelblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Temperature (°C)", title = "2020 Data")+
+  ecodata::theme_ts()
+```
+
+### Salinity 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+grbdaily %>% 
+  filter(Variable == "sal") %>% filter(year >= 2007) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Salinity Concentration (psu)", title = "") +
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ecodata::theme_ts()
+
+grbdaily %>% 
+  filter(Variable == "sal") %>% filter(year >= 2020) %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
+  geom_line(color = "steelblue")+
+  labs(x = "Year", y = "Salinity Concentration (psu)", title = "2020 Data") +
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   ecodata::theme_ts()
 ```
