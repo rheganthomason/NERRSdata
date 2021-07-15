@@ -1,0 +1,42 @@
+---
+title: "Heatwave"
+output: html_document
+---
+
+# Narraganset
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(heatwaveR)
+library(tidyverse)
+library(readxl)
+library(stringr)
+library(readr)
+
+narts_heatwave_csv<-"nar_heatwave.csv"
+raw.dir <- here::here("data")
+nar.heatwave<-read_csv(file.path(raw.dir,narts_heatwave_csv), col_types = cols(temp = col_double(),t = col_date()))
+
+ts <- heatwaveR::ts2clm(nar.heatwave, climatologyPeriod = c("2007-01-03", "2020-12-31"))
+nar.mhw <- heatwaveR::detect_event(ts)
+  
+mhw<- nar.mhw$clim %>%
+  mutate(Site = c("NAR"),
+         Year = c("2020"))
+
+mhw %>% 
+  filter(Site == "NAR", 
+         str_detect(t, "2020")) %>% 
+  ggplot( aes(x = t, y = temp))+
+  geom_flame(aes(y2 = thresh))+ 
+  geom_line(aes(x = t, y = seas, color = "a"), size = 1)+
+  geom_line(aes(x = t, y = thresh, color = "c"), size = 1)+
+  geom_line(aes(x = t, y = temp, color = "b"))+
+  scale_colour_manual(values = c("turquoise4", "sienna3", "black"),
+                      labels = c("Climatology","Temperature", "Threshold"))+
+  labs(x = "", y = "Temperature (C)", title = "2020 data")+
+  scale_x_date(date_labels = "%b", breaks = "1 month")+
+  theme_bw()+
+  theme(legend.title = element_blank(),
+        legend.position=c(0.2, 0.8))+
+  ecodata::theme_title()
+```
