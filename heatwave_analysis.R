@@ -22,20 +22,20 @@ nar.heatwave<-read_csv(file.path(raw.dir,narts_heatwave_csv),
   
   
   # Narragansett
-ts <- heatwaveR::ts2clm(nar.heatwave, climatologyPeriod = c("2004-01-01", "2019-12-31"))
+ts <- heatwaveR::ts2clm(nar.heatwave, climatologyPeriod = c("2007-01-03", "2020-12-31"))
 nar.mhw <- heatwaveR::detect_event(ts)
   
 mhw<- nar.mhw$clim %>%
   mutate(Site = c("NAR"),
          Year = c("2020"))
-mhw.nar.year <- mhw[5845:6210,] ## Pull out just 2020
+#mhw.nar.year <- mhw[5845:6210,] ## Pull out just 2020
 
 heatwaveR::lolli_plot(nar.mhw)
 
-mhw.nar.year %>% 
+mhw %>%
   filter(Site == "NAR", 
          str_detect(t, "2020")) %>% 
-  ggplot( aes(x = t, y = temp))+
+  ggplot(aes(x = t, y = temp))+
   geom_flame(aes(y2 = thresh))+ 
   geom_line(aes(x = t, y = seas, color = "a"), size = 1)+
   geom_line(aes(x = t, y = thresh, color = "c"), size = 1)+
