@@ -1,15 +1,18 @@
 ## Time series/Climatology
 
 #for chlorophyll climo
+df <- nar2 %>% dplyr::filter(nar2$Variable == "chla_n" & year == 2020)
 nar2 %>% dplyr::filter(nar2$Variable == "chla_n") %>% 
-  ggplot(aes(x = month, y = Climatology, group = "1"))+
+  ggplot(aes(x = month, y = Climatology, group_by("1")))+
   ecodata::theme_ts()+
   geom_point()+
+  geom_point(data = only2020data, aes(x = month, y = Value), color = "red", size = 2))+
+  #geom_line(data = only2020data, aes(x = month, y = Value), color = "red")+
   geom_line()+
   geom_errorbar(aes(ymin=Climatology-clim.sd, ymax=Climatology+clim.sd), width=.2,
                 position=position_dodge(0.05), color = "steelblue")+
-  #facet_grid(~station, scales = "free")+
   labs(x = element_blank(), y = "Chlorophyll (μg/L)")+
+  theme(legend.position = "side")+
   ggtitle("Narragansett - Climatology")
 
 #anoms 

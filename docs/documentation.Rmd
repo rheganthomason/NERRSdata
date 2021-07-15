@@ -1,6 +1,109 @@
 # Documentation
 
+## Map of stations
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(sf)
+library(SWMPr)
+library(tidyverse)
+
+codes <- SWMPr::site_codes() %>%
+dplyr::filter(state == c("me", "nh", "ma", "ri")) %>% 
+  dplyr::mutate(latitude = as.numeric(latitude), 
+                longitude = as.numeric(longitude)*-1) 
+
+site_labels <- codes %>% 
+  group_by(reserve_name) %>% 
+  slice(1) 
+
+xmin = -72
+xmax = -69
+ymin = 41
+ymax = 44
+xlims <- c(xmin, xmax)
+ylims <- c(ymin, ymax)
+crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+m <- ggplot()+
+  ggplot2::geom_sf(data = ecodata::coast) +
+  ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
+  geom_point(aes(longitude, latitude), data = codes, color = "midnightblue")+
+  geom_label(data = site_labels, aes( longitude, latitude, label = reserve_name),
+             size = 3, fontface = "bold", nudge_y = 0.18) 
+
+xbreaks <- seq(-72, -69, 1)
+ybreaks <- pretty(codes$latitude)
+xlabels <- paste0(abs(xbreaks), "°W")
+ylabels <- paste0(abs(ybreaks), "°N")
+
+m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+ 
+  scale_y_continuous(breaks = ybreaks, labels = ylabels)+ 
+  labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
+```
+
 ## Narraganset (Daily) {.tabset}
+
+### Histograms
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(SWMPr)
+library(tidyverse)
+
+narts <- all_params_dtrng("nartsnut", c('01/01/2010', '12/31/2020'))
+
+narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
+  tidyr::drop_na(Value) %>% 
+  mutate(station = c("NAR")) %>% mutate(year =)
+
+narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
+  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
+  tidyr::drop_na(Value) %>% 
+  mutate(station = c("TWharfSurface"))
+
+nar <- rbind(narts2)
+
+nar %>% dplyr::filter(nar$Variable == "chla_n") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logChlorophyll")
+
+nar %>% dplyr::filter(nar$Variable == "po4f") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logOrthophosphate")
+
+nar %>% dplyr::filter(nar$Variable == "nh4f") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logAmmonium")
+
+nar %>% dplyr::filter(nar$Variable == "no2f") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logNitrite")
+
+nar %>% dplyr::filter(nar$Variable == "no3f") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logNitrate")
+
+nar %>% dplyr::filter(nar$Variable == "no23f") %>% 
+  dplyr::mutate(logvalue = log(Value)) %>%
+  ggplot(aes(x = logvalue))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Narragansett - logNitriteNitrate")
+```
 
 ### Dissolved Oygen
 For milligrams per liter:
