@@ -29,7 +29,7 @@ narts <- all_params_dtrng("nartsnut", c('01/01/2010', '12/31/2020'))
 narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
   tidyr::drop_na(Value) %>% 
-  mutate(station = c("TWharfSurface"))
+  mutate(station = c("NAR")) %>% mutate(year =)
 
 # narnc2 <- narnc %>%  mutate_if(is.character,as.numeric) %>% 
 #   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
@@ -38,6 +38,7 @@ narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>%
 
 nar<- narts2
 
+
 # dirty plot
 nar %>% 
   ggplot(aes(x = datetimestamp, y = Value))+
@@ -45,10 +46,15 @@ nar %>%
   facet_grid(Variable~station, scales = "free")+
   ggtitle("Narragansett Stations")
 
-nar2 <- nar %>% mutate(month = lubridate::month(datetimestamp, label =TRUE, abbr=TRUE)) %>%
-  group_by(month, Variable, station) %>% summarise(Climatology = mean(Value)) %>% 
-  mutate(clim.sd = sd(Value)) %>% 
-  ungroup() 
+nar2 <- nar %>% mutate(month = lubridate::month(datetimestamp, label =TRUE, abbr=TRUE)) %>% 
+  group_by(month, Variable, station) %>% summarise(Climatology = mean(Value),
+  clim.sd = sd(Value)) %>% ungroup()
+
+only2020data <- nar %>% mutate(month = lubridate::month(datetimestamp, label =TRUE, abbr=TRUE),
+                         year = lubridate::year(datetimestamp)) %>% filter(Variable == "chla_n" & year == 2020)
+
+  nar2year <- nar %>% mutate(year = lubridate::year(datetimestamp)) %>% 
+  filter(nar)
 
 nar3 <- nar %>% mutate(month = lubridate::month(datetimestamp),
                        year = lubridate::year(datetimestamp)) %>%

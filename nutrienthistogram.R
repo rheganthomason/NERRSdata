@@ -13,7 +13,7 @@ narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>%
   tidyr::drop_na(Value) %>% 
   mutate(station = c("TWharfSurface"))
 
-nar <- rbind(narpc2, narts2)
+nar <- rbind(narts2)
 
 # dirty plot, chla normal
 nar %>% dplyr::filter(nar$Variable == "chla_n") %>%
