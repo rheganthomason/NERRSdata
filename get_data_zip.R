@@ -49,12 +49,10 @@ for (i in nut){
 
 write.csv(nut.out, file = "data/nutrients_all.csv")
 
-
-nutrients_pep<- nut.out %>% 
-  filter(station == c("grbgbnut  " , "nartsnut  ","wqbmpnut  " )) ### Doesn't include Wells yet
-
-
-write.csv(nutrients_pep, file = "data/nutrient_pep.csv")
+dat<- read_csv(here::here("data", "nutrients_all.csv"))
+nut_pep<- dat %>% 
+  filter(station == c("grbgbnut", "nartsnut","wqbmpnut", "welinnut" )) 
+write.csv(nut_pep, file = "data/nutrient_pep.csv")
 
 
 ###################################################################
@@ -119,9 +117,9 @@ wq.out %>% filter(Variable == "DO_mgl" & station == "wqbslwq   ") %>%
 
 write.csv(wq.out, file = "data/water_quality_all.csv")
 
-
-wq_pep<- wq.out %>% 
-  filter(station == c("grbgbwq  " , "nartswq  ","wqbmpwq  " )) ### Doesn't include Wells yet
+dat<- read_csv(here::here("data", "water_quality_all.csv"))
+wq_pep<- dat %>% 
+  filter(station == c("grbgbwq" , "nartswq","wqbmpwq", "welinwq" )) 
 
 
 write.csv(wq_pep, file = "data/water_quality_pep.csv")
@@ -181,7 +179,7 @@ for (i in met){
 
 
 
-met.out %>% filter(Variable == "ATemp" & station == "wellfmet  ") %>% 
+met.out %>% filter(Variable == "ATemp" & station == "wqbchmet  ") %>% 
   ggplot(aes(x = date, y = mean_daily))+
   geom_point()
 
@@ -189,9 +187,50 @@ met.out %>% filter(Variable == "ATemp" & station == "wellfmet  ") %>%
 
 write.csv(met.out, file = "data/meterology_all.csv")
 
+###################################################
+########### HEATWAVE #############################
+##################################################
+dat<- read_csv(here::here("data", "water_quality_pep.csv"))
 
+nar_hw<- dat %>% 
+  filter(station == "nartswq", 
+         Variable == "Temp") %>% 
+  select(date, mean_daily) %>% 
+  drop_na() %>% 
+  rename(t = date, 
+         temp = mean_daily)
 
+write.csv(nar_hw, file = "data/nar_heatwave.csv")
 
+wel_hw<- dat %>% 
+  filter(station == "welinwq", 
+         Variable == "Temp") %>% 
+  select(date, mean_daily) %>% 
+  drop_na() %>% 
+  rename(t = date, 
+         temp = mean_daily)
+
+write.csv(wel_hw, file = "data/wel_heatwave.csv")
+
+wqb_hw<- dat %>% 
+  filter(station == "wqbmpwq", 
+         Variable == "Temp") %>% 
+  select(date, mean_daily) %>% 
+  drop_na() %>% 
+  rename(t = date, 
+         temp = mean_daily)
+
+write.csv(wqb_hw, file = "data/wqb_heatwave.csv")
+
+grb_hw<- dat %>% 
+  filter(station == "grbgbwq", 
+         Variable == "Temp") %>% 
+  select(date, mean_daily) %>% 
+  drop_na() %>% 
+  rename(t = date, 
+         temp = mean_daily)
+
+write.csv(grb_hw, file = "data/grb_heatwave.csv")
 
 
 
