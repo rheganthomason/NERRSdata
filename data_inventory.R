@@ -57,5 +57,3 @@ nar3 <- nar %>% mutate(month = lubridate::month(datetimestamp),
                        year = lubridate::year(datetimestamp)) %>%
   group_by(month, Variable, station) %>% mutate(Climatology = mean(Value)) %>%
   mutate(anom = exp(log(Value)-log(Climatology))) %>% ungroup()
-
-

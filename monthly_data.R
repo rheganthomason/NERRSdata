@@ -1,11 +1,12 @@
 ## Monthly data graphs (water quality: DO, sal, temp)
 
+
 monthly <- read_csv(here::here("data/water_quality_pep.csv"))
 nartsmonth <- monthly %>% filter(station == "nartswq")
 waqmonth <- monthly %>% filter(station == "wqbmpwq")
 welmonth <- monthly %>% filter(station == "welinwq")
 grbmonth <- monthly %>% filter(station == "grbgbwq") %>% 
-mutate(date = as.Date(date))
+mutate(date = as.Date(date)) 
 
 #monthly DO (mg/L) for NAR
 nartsmonth %>% 
