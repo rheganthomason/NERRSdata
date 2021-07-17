@@ -1,61 +1,14 @@
-# Documentation
+---
+title: "Documentation"
+output:
+  html_document: {toc: true, toc_float: true,
+  toc_depth: 2}
+---
 
-## map that wont work!!!
-
-# ```{r, message=FALSE, echo=FALSE, warning=FALSE}
-# library(sf)
-# library(SWMPr)
-# library(tidyverse)
-# library(ggrepel)
-# library(raster)
-# install.packages(rgdal)
-# 
-# 
-# grb.codes <- SWMPr::site_codes() %>%
-#   dplyr::filter(nerr_site_id == c("grb"))
-# nar.codes <- SWMPr::site_codes() %>%
-#   dplyr::filter(nerr_site_id == c("nar"))
-# wel.codes <- SWMPr::site_codes() %>%
-#   dplyr::filter(nerr_site_id == c("wel"))
-# wqb.codes <- SWMPr::site_codes() %>%
-#   dplyr::filter(nerr_site_id == c("wqb"))
-# 
-# codes <- rbind(grb.codes, nar.codes, wel.codes, wqb.codes) %>% 
-#   dplyr::mutate(latitude = as.numeric(latitude), 
-#                 longitude = as.numeric(longitude)*-1) 
-# site_labels <- codes %>% 
-#   group_by(reserve_name) %>% 
-#   slice(1) 
-# 
-# crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77+x_0=0
-# +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
-# coast_shp <- rgdal::readOGR(file.path(here::here("data-raw","coast", "USA.shp")), verbose = F)
-# crs(coast_shp) <- crs
-# coast_sf <- as(coast_shp, "sf")
-# 
-# xmin = -72
-# xmax = -69
-# ymin = 41
-# ymax = 44
-# xlims <- c(xmin, xmax)
-# ylims <- c(ymin, ymax)
-# crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
-# m <- ggplot()+
-#   ggplot2::geom_sf(data = coast_sf) +
-#   ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
-#   geom_point(aes(longitude, latitude), data = codes, color = "midnightblue")+
-#   geom_label_repel(data = site_labels, aes( longitude, latitude, label = reserve_name),
-#                    size = 3) 
-# xbreaks <- seq(-72, -69, 1)
-# ybreaks <- pretty(codes$latitude)
-# xlabels <- paste0(abs(xbreaks), "°W")
-# ylabels <- paste0(abs(ybreaks), "°N")
-# m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+ 
-#   scale_y_continuous(breaks = ybreaks, labels = ylabels)+ 
-#   labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
-# ```
+# PEP project
 
 ## Map of stations
+
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
 library(sf)
 library(SWMPr)
@@ -95,70 +48,7 @@ m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+
   labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
 ```
 
-## Narraganset (Daily) {.tabset}
-
-### Histograms
-
-```{r, message=FALSE, echo=FALSE, warning=FALSE}
-library(SWMPr)
-library(tidyverse)
-
-narts <- all_params_dtrng("nartsnut", c('01/01/2010', '12/31/2020'))
-
-narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
-  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
-  tidyr::drop_na(Value) %>% 
-  mutate(station = c("NAR")) %>% mutate(year =)
-
-narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
-  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
-  tidyr::drop_na(Value) %>% 
-  mutate(station = c("TWharfSurface"))
-
-nar <- rbind(narts2)
-
-nar %>% dplyr::filter(nar$Variable == "chla_n") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logChlorophyll")
-
-nar %>% dplyr::filter(nar$Variable == "po4f") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logOrthophosphate")
-
-nar %>% dplyr::filter(nar$Variable == "nh4f") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logAmmonium")
-
-nar %>% dplyr::filter(nar$Variable == "no2f") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logNitrite")
-
-nar %>% dplyr::filter(nar$Variable == "no3f") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logNitrate")
-
-nar %>% dplyr::filter(nar$Variable == "no23f") %>% 
-  dplyr::mutate(logvalue = log(Value)) %>%
-  ggplot(aes(x = logvalue))+
-  geom_histogram()+
-  facet_grid(Variable~station, scales = "free")+
-  ggtitle("Narragansett - logNitriteNitrate")
-```
+## Narraganset (Daily) {.tabset} 
 
 ### Dissolved Oygen
 For milligrams per liter:
@@ -256,6 +146,7 @@ nartsdaily %>%
 ```
 
 ### Climatology
+
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
 library(SWMPr)
 narts <- all_params_dtrng("nartsnut", c('01/01/2010', '12/31/2020'))
@@ -401,3 +292,476 @@ grbdaily %>%
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   ecodata::theme_ts()
 ```
+
+## Narraganset (Monthly) {.tabset}
+
+### Dissolved Oxygen
+For milligrams per liter:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+monthly <- read_csv(here::here("data/water_quality_pep.csv"))
+nartsmonth <- monthly %>% filter(station == "nartswq")
+waqmonth <- monthly %>% filter(station == "wqbmpwq")
+welmonth <- monthly %>% filter(station == "welinwq")
+grbmonth <- monthly %>% filter(station == "grbgbwq") %>% 
+mutate(date = as.Date(date))
+
+nartsmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)")+
+  ecodata::theme_ts()
+
+nartsmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+For percent saturation:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+nartsmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)") +
+  ecodata::theme_ts()
+
+nartsmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Temperature 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+nartsmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)")+
+  ecodata::theme_ts()
+
+nartsmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Salinity
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+nartsmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)")+
+  ecodata::theme_ts()
+
+nartsmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Chlorophyll 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+chloro_nutri <- read_csv(here::here("data/nutrient_pep.csv"))
+nartsnut <- chloro_nutri %>% filter(station == "nartsnut")
+welnut <- chloro_nutri %>% filter(station == "welinnut")
+grbnut <- chloro_nutri %>% filter(station == "grbgbnut") %>%
+  mutate(date = as.Date(date))
+
+nartsnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "")+
+  ecodata::theme_ts()
+```
+
+## Great Bay (Monthly) {.tabset}
+
+### Dissolved Oxygen
+
+For milligrams per liter:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+grbmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+  
+For percent saturation:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+grbmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)") +
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+  
+### Temperature
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+grbmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Salinity
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+grbmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Chlorophyll 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+grbnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "")+
+  ecodata::theme_ts()
+```
+
+## Waquoit (Monthly)
+
+### Dissolved Oxygen
+For milligrams per liter: 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+waqmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+For percent saturation:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+waqmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)") +
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Temperature 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+waqmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Salinity 
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+waqmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+## Wells (Monthly) {.tabset}
+
+### Dissolved Oxygen
+
+For milligrams per liter:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+welmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+  
+For percent saturation:
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+welmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)") +
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+  
+### Temperature
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+welmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Salinity
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+welmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "2020 data")+
+  ecodata::theme_ts()
+```
+
+### Chlorophyll
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE}
+welnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_line(color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Wells Chlorophyll Concentration")+
+  ecodata::theme_ts()
+```
+
+## map that wont work!!!
+
+# ```{r, message=FALSE, echo=FALSE, warning=FALSE}
+# library(sf)
+# library(SWMPr)
+# library(tidyverse)
+# library(ggrepel)
+# library(raster)
+# install.packages(rgdal)
+# 
+# 
+# grb.codes <- SWMPr::site_codes() %>%
+#   dplyr::filter(nerr_site_id == c("grb"))
+# nar.codes <- SWMPr::site_codes() %>%
+#   dplyr::filter(nerr_site_id == c("nar"))
+# wel.codes <- SWMPr::site_codes() %>%
+#   dplyr::filter(nerr_site_id == c("wel"))
+# wqb.codes <- SWMPr::site_codes() %>%
+#   dplyr::filter(nerr_site_id == c("wqb"))
+# 
+# codes <- rbind(grb.codes, nar.codes, wel.codes, wqb.codes) %>% 
+#   dplyr::mutate(latitude = as.numeric(latitude), 
+#                 longitude = as.numeric(longitude)*-1) 
+# site_labels <- codes %>% 
+#   group_by(reserve_name) %>% 
+#   slice(1) 
+# 
+# crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77+x_0=0
+# +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+# coast_shp <- rgdal::readOGR(file.path(here::here("data-raw","coast", "USA.shp")), verbose = F)
+# crs(coast_shp) <- crs
+# coast_sf <- as(coast_shp, "sf")
+# 
+# xmin = -72
+# xmax = -69
+# ymin = 41
+# ymax = 44
+# xlims <- c(xmin, xmax)
+# ylims <- c(ymin, ymax)
+# crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+# m <- ggplot()+
+#   ggplot2::geom_sf(data = coast_sf) +
+#   ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
+#   geom_point(aes(longitude, latitude), data = codes, color = "midnightblue")+
+#   geom_label_repel(data = site_labels, aes( longitude, latitude, label = reserve_name),
+#                    size = 3) 
+# xbreaks <- seq(-72, -69, 1)
+# ybreaks <- pretty(codes$latitude)
+# xlabels <- paste0(abs(xbreaks), "°W")
+# ylabels <- paste0(abs(ybreaks), "°N")
+# m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+ 
+#   scale_y_continuous(breaks = ybreaks, labels = ylabels)+ 
+#   labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
+# ```

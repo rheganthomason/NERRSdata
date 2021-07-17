@@ -3,11 +3,6 @@
 library(tidyverse)
 
 # Wrangle data
-narpc2 <- narpc %>%  mutate_if(is.character,as.numeric) %>% 
-  tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
-  tidyr::drop_na(Value) %>% 
-  mutate(station = c("PottersCove"))
-
 narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>% 
   tidyr::pivot_longer(!datetimestamp, names_to = "Variable", values_to = "Value") %>% 
   tidyr::drop_na(Value) %>% 
@@ -15,7 +10,7 @@ narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>%
 
 nar <- rbind(narts2)
 
-# dirty plot, chla normal
+#chla normal
 nar %>% dplyr::filter(nar$Variable == "chla_n") %>%
   ggplot(aes(x = Value))+
   geom_histogram()+
@@ -104,3 +99,41 @@ nar %>% dplyr::filter(nar$Variable == "no23f") %>%
   geom_histogram()+
   facet_grid(Variable~station, scales = "free")+
   ggtitle("Narragansett - logNitriteNitrate")
+
+## great bay nutri histos
+nutrient_pep <- read_csv(here::here("data/nutrient_pep.csv"))
+
+nutrient_pep_grb <- nutrient_pep %>% mutate(station = c("grbgnut")) %>% mutate(year =)
+
+# chloro hist for great bay
+nutrient_pep_grb %>% dplyr::filter(nutrient_pep$Variable == "CHLA_N") %>% 
+  ggplot(aes(x = mean_daily))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Great Bay - Chlorophyll")
+
+nutrient_pep_grb %>% dplyr::filter(nutrient_pep$Variable == "PO4F") %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_point()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("Great Bay - Orthophosphate")
+
+nutrient_pep_grb %>% dplyr::filter(nutrient_pep$Variable == "CHLA_N") %>% 
+  ggplot(aes(x = mean_daily))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("")
+
+nutrient_pep_grb %>% dplyr::filter(nutrient_pep$Variable == "CHLA_N") %>% 
+  ggplot(aes(x = mean_daily))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("")
+
+nutrient_pep_grb %>% dplyr::filter(nutrient_pep$Variable == "CHLA_N") %>% 
+  ggplot(aes(x = mean_daily))+
+  geom_histogram()+
+  facet_grid(Variable~station, scales = "free")+
+  ggtitle("")
+
+

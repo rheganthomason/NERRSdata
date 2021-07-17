@@ -61,7 +61,7 @@ grbdaily %>%
   filter(Variable == "do_mgl") %>% filter(year >= 2007) %>% 
   ggplot(aes(x = date, y = mean_daily))+
   geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci), color = "lightblue", alpha = 0.75)+
-  geom_line(color = "steelblue")+
+  geom_line(color = "steelblue", na.rm = FALSE)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ecodata::theme_ts()

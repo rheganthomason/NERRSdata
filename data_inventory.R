@@ -38,7 +38,6 @@ narts2 <- narts %>%  mutate_if(is.character,as.numeric) %>%
 
 nar<- narts2
 
-
 # dirty plot
 nar %>% 
   ggplot(aes(x = datetimestamp, y = Value))+
@@ -53,10 +52,10 @@ nar2 <- nar %>% mutate(month = lubridate::month(datetimestamp, label =TRUE, abbr
 only2020data <- nar %>% mutate(month = lubridate::month(datetimestamp, label =TRUE, abbr=TRUE),
                          year = lubridate::year(datetimestamp)) %>% filter(Variable == "chla_n" & year == 2020)
 
-  nar2year <- nar %>% mutate(year = lubridate::year(datetimestamp)) %>% 
-  filter(nar)
 
 nar3 <- nar %>% mutate(month = lubridate::month(datetimestamp),
                        year = lubridate::year(datetimestamp)) %>%
   group_by(month, Variable, station) %>% mutate(Climatology = mean(Value)) %>%
   mutate(anom = exp(log(Value)-log(Climatology))) %>% ungroup()
+
+
