@@ -37,4 +37,3 @@ welnut%>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Wells Chlorophyll Concentration")+
   ecodata::theme_ts()
-

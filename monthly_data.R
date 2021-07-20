@@ -13,7 +13,7 @@ nartsmonth %>%
   filter(Variable == "DO_mgl") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset DO (mg/L) - Monthly")+
   ecodata::theme_ts()
@@ -23,7 +23,7 @@ nartsmonth %>%
   filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset DO (mg/L)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -33,7 +33,7 @@ nartsmonth %>%
   filter(Variable == "DO_Pct") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset DO (% saturation) - Monthly") +
   ecodata::theme_ts()
@@ -43,7 +43,7 @@ nartsmonth %>%
   filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset DO (% saturation)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -53,7 +53,7 @@ nartsmonth %>%
   filter(Variable == "Temp") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Temperature (C)", title = "Narraganset Temperature - Monthly")+
   ecodata::theme_ts()
@@ -63,7 +63,7 @@ nartsmonth %>%
   filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "Year", y = "Temperature (C)", title = "Narraganset Temperature - Monthly (2020)")+
   ecodata::theme_ts()
@@ -73,7 +73,7 @@ nartsmonth %>%
   filter(Variable == "Sal") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Salnity (psu)", title = "Narraganset Salinity - Monthly")+
   ecodata::theme_ts()
@@ -83,7 +83,7 @@ nartsmonth %>%
   filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "Year", y = "Salinity (psu)", title = "Narraganset Salinity - Monthly (2020)")+
   ecodata::theme_ts()
@@ -93,7 +93,7 @@ grbmonth %>%
   filter(Variable == "DO_mgl") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay DO (mg/L) - Monthly")+
   ecodata::theme_ts()
@@ -103,7 +103,7 @@ grbmonth %>%
   filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay DO (mg/L)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -113,7 +113,7 @@ grbmonth %>%
   filter(Variable == "DO_Pct") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay DO (% saturation) - Monthly") +
   ecodata::theme_ts()
@@ -123,7 +123,7 @@ grbmonth %>%
   filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay DO (% saturation)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -133,7 +133,7 @@ grbmonth %>%
   filter(Variable == "Temp") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Temperature (C)", title = "Great Bay Temperature - Monthly")+
   ecodata::theme_ts()
@@ -143,7 +143,7 @@ grbmonth %>%
   filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Temperature (C)", title = "Great Bay Temperature - Monthly (2020)")+
   ecodata::theme_ts()
@@ -153,7 +153,7 @@ grbmonth %>%
   filter(Variable == "Sal") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Salnity (psu)", title = "Narraganset Salinity - Monthly")+
   ecodata::theme_ts()
@@ -163,7 +163,7 @@ grbmonth %>%
   filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Salinity (psu)", title = "Narraganset Salinity - Monthly (2020)")+
   ecodata::theme_ts()
@@ -174,7 +174,7 @@ waqmonth %>%
   filter(Variable == "DO_mgl") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit DO (mg/L) - Monthly")+
   ecodata::theme_ts()
@@ -184,7 +184,7 @@ waqmonth %>%
   filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit DO (mg/L)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -194,7 +194,7 @@ waqmonth %>%
   filter(Variable == "DO_Pct") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit DO (% saturation) - Monthly") +
   ecodata::theme_ts()
@@ -204,7 +204,7 @@ waqmonth %>%
   filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit DO (% saturation)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -214,7 +214,7 @@ waqmonth %>%
   filter(Variable == "Temp") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Temperature (C)", title = "Waquoit Temperature - Monthly")+
   ecodata::theme_ts()
@@ -224,7 +224,7 @@ waqmonth %>%
   filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Temperature (C)", title = "Waquoit Temperature - Monthly (2020)")+
   ecodata::theme_ts()
@@ -234,7 +234,7 @@ waqmonth %>%
   filter(Variable == "Sal") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Salnity (psu)", title = "Waquoit Salinity - Monthly")+
   ecodata::theme_ts()
@@ -244,7 +244,7 @@ waqmonth %>%
   filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Salinity (psu)", title = "Waquoit Salinity - Monthly (2020)")+
   ecodata::theme_ts()
@@ -255,7 +255,7 @@ welmonth %>%
   filter(Variable == "DO_mgl") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells DO (mg/L) - Monthly")+
   ecodata::theme_ts()
@@ -265,7 +265,7 @@ welmonth %>%
   filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells DO (mg/L)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -275,7 +275,7 @@ welmonth %>%
   filter(Variable == "DO_Pct") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells DO (% saturation) - Monthly") +
   ecodata::theme_ts()
@@ -285,7 +285,7 @@ welmonth %>%
   filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells DO (% saturation)- Monthly (2020)")+
   ecodata::theme_ts()
@@ -295,7 +295,7 @@ welmonth %>%
   filter(Variable == "Temp") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Temperature (C)", title = "Wells Temperature - Monthly")+
   ecodata::theme_ts()
@@ -305,7 +305,7 @@ welmonth %>%
   filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Temperature (C)", title = "Wells Temperature - Monthly (2020)")+
   ecodata::theme_ts()
@@ -315,7 +315,7 @@ welmonth %>%
   filter(Variable == "Sal") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   labs(x = "Year", y = "Salnity (psu)", title = "Wells Salinity - Monthly")+
   ecodata::theme_ts()
@@ -325,7 +325,7 @@ welmonth %>%
   filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  #geom_line(color = "lightblue")+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
   labs(x = "", y = "Salinity (psu)", title = "Wells Salinity - Monthly (2020)")+
   ecodata::theme_ts()
