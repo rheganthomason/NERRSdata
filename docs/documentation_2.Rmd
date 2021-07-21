@@ -1,0 +1,400 @@
+---
+
+title: "Documentation 2"
+output: 
+  html_document: {toc: true, toc_float: true,
+  toc_depth: 2}
+  
+---
+
+# PEP Project
+
+## Dissolved Oxygen (mg/L) {.tabset}
+
+### All years
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, figures-side, fig.show="hold", out.width="50%"}
+library(tidyverse)
+raw.dir <- here::here("data")
+daily_csv <-"water_quality_pep.csv"
+daily <- read_csv(file.path(raw.dir,daily_csv))
+
+rmdomgl<-daily %>% group_by(station) %>% 
+  filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15)
+
+rmdopct<-daily %>% group_by(station) %>% 
+  filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 ) 
+
+rmtemp<-daily %>% group_by(station) %>% 
+  filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 )
+
+rmsal<-daily %>% group_by(station) %>% 
+  filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 )
+
+monthly <- rbind(rmdomgl, rmdopct, rmtemp, rmsal)
+
+nartsmonth <- monthly %>% filter(station == "nartswq")
+waqmonth <- monthly %>% filter(station == "wqbmpwq")
+welmonth <- monthly %>% filter(station == "welinwq")
+grbmonth <- monthly %>% filter(station == "grbgbwq") %>% 
+mutate(date = as.Date(date)) 
+
+nartsmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+### Only 2020
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+## Dissolved Oxygen (%) {.tabset}
+
+### All years
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset") +
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay") +
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit Bay") +
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells Bay") +
+  ecodata::theme_ts()
+```
+
+### Only 2020
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "DO_Pct") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+## Temperature {.tabset}
+
+### All years
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Temperature (C)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+### Only 2020
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Temp") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Temperature (C)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+## Salinity {.tabset}
+
+### All years
+
+``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Salnity (psu)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+### Only 2020
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+nartsmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+waqmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "Waquoit Bay")+
+  ecodata::theme_ts()
+
+welmonth %>% 
+  filter(Variable == "Sal") %>% filter(date >= "2020-01-01") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  labs(x = "", y = "Salinity (psu)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
+
+## Chlorophyll
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
+chloro_nutri <- read_csv(here::here("data/nutrient_pep.csv"))
+nartsnut <- chloro_nutri %>% filter(station == "nartsnut")
+welnut <- chloro_nutri %>% filter(station == "welinnut")
+grbnut <- chloro_nutri %>% filter(station == "grbgbnut") %>%
+  mutate(date = as.Date(date))
+
+nartsnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Narraganset")+
+  ecodata::theme_ts()
+
+grbnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Great Bay")+
+  ecodata::theme_ts()
+
+welnut%>% 
+  filter(Variable == "CHLA_N") %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Wells Bay")+
+  ecodata::theme_ts()
+```
