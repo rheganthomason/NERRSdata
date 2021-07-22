@@ -45,6 +45,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -54,6 +55,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -63,6 +65,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -72,6 +75,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -85,6 +89,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 15)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -94,6 +99,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 15)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -103,6 +109,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 15)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -112,6 +119,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 15)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -127,6 +135,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(50, 120)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset") +
   ecodata::theme_ts()
 
@@ -136,6 +145,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(50, 120)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay") +
   ecodata::theme_ts()
 
@@ -145,6 +155,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(50, 120)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit Bay") +
   ecodata::theme_ts()
 
@@ -154,6 +165,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(50, 120)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells Bay") +
   ecodata::theme_ts()
 ```
@@ -167,6 +179,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(50, 120)+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -176,6 +189,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(50, 120)+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -185,6 +199,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(50, 120)+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -194,6 +209,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(50, 120)+
   labs(x = "", y = "Dissolved Oxygen Concentration (% saturation)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -209,6 +225,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 30)+
   labs(x = "Year", y = "Temperature (C)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -218,6 +235,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 30)+
   labs(x = "Year", y = "Temperature (C)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -227,6 +245,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 30)+
   labs(x = "Year", y = "Temperature (C)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -236,6 +255,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 30)+
   labs(x = "Year", y = "Temperature (C)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -249,6 +269,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 30)+
   labs(x = "", y = "Temperature (C)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -258,6 +279,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 30)+
   labs(x = "", y = "Temperature (C)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -267,6 +289,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 30)+
   labs(x = "", y = "Temperature (C)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -276,6 +299,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 30)+
   labs(x = "", y = "Temperature (C)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -291,6 +315,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 32)+
   labs(x = "Year", y = "Salnity (psu)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -300,6 +325,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 32)+
   labs(x = "Year", y = "Salnity (psu)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -309,6 +335,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 32)+
   labs(x = "Year", y = "Salnity (psu)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -318,6 +345,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 32)+
   labs(x = "Year", y = "Salnity (psu)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -331,6 +359,7 @@ nartsmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 32)+
   labs(x = "", y = "Salinity (psu)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -340,6 +369,7 @@ grbmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 32)+
   labs(x = "", y = "Salinity (psu)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -349,6 +379,7 @@ waqmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 32)+
   labs(x = "", y = "Salinity (psu)", title = "Waquoit Bay")+
   ecodata::theme_ts()
 
@@ -358,6 +389,7 @@ welmonth %>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%b", date_breaks = "1 month")+
+  ylim(0, 32)+
   labs(x = "", y = "Salinity (psu)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
@@ -377,6 +409,7 @@ nartsnut%>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 10)+
   labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Narraganset")+
   ecodata::theme_ts()
 
@@ -386,6 +419,7 @@ grbnut%>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 10)+
   labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Great Bay")+
   ecodata::theme_ts()
 
@@ -395,6 +429,7 @@ welnut%>%
   geom_point(color = "lightblue")+
   geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 10)+
   labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Wells Bay")+
   ecodata::theme_ts()
 ```
