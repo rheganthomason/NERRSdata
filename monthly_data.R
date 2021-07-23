@@ -4,37 +4,61 @@
 raw.dir <- here::here("data")
 daily_csv <-"water_quality_pep.csv"
 daily <- read_csv(file.path(raw.dir,daily_csv))
+dailyyear <- daily %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+                              year = lubridate::year(date))
 
-rmdomgl<-daily %>% group_by(station) %>% 
-  filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15)
+rmdomgl<-dailyyear %>% filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
 
-rmdopct<-daily %>% group_by(station) %>% 
-  filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 ) 
+rmdopct<-dailyyear %>% filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 ) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
 
-rmtemp<-daily %>% group_by(station) %>% 
-  filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 )
+rmtemp<-dailyyear %>% filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 ) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
 
-rmsal<-daily %>% group_by(station) %>% 
-  filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 )
+rmsal<-dailyyear %>% filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 ) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
 
 monthly <- rbind(rmdomgl, rmdopct, rmtemp, rmsal)
+
+## only 2020 points
+rmdomgl2020 <-dailyyear %>% filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmdopct2020 <-dailyyear %>% filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 ) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmtemp2020 <-dailyyear %>% filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 ) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmsal2020 <-dailyyear %>% filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 ) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
 
 #filter by station
 nartsmonth <- monthly %>% filter(station == "nartswq")
 waqmonth <- monthly %>% filter(station == "wqbmpwq")
 welmonth <- monthly %>% filter(station == "welinwq")
-grbmonth <- monthly %>% filter(station == "grbgbwq") %>% 
-mutate(date = as.Date(date)) 
+grbmonth <- monthly %>% filter(station == "grbgbwq") 
 
 #monthly DO (mg/L) for NAR
 nartsmonth %>% 
   filter(Variable == "DO_mgl") %>% 
-  ggplot(aes(date, mean_daily))+
-  geom_point(color = "lightblue")+
-  geom_smooth(method = "loess", span = 0.05, color = "steelblue")+
-  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ggplot(aes(month, mean_month))+
+  geom_point(color = "steelblue", size = 2)+
+  #geom_smooth(method = "loess", span = 0.01, color = "steelblue")+
+  geom_point(data = rmdomgl2020 %>% filter(Variable == "DO_mgl", 
+                                           station == "nartswq"), aes(month, mean_month), color = "red", size = 2)+
   ylim(0, 15)+
-  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset DO (mg/L) - Monthly")+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Narraganset DO (mg/L) - Monthly")+
   ecodata::theme_ts()
 
 #just 2020

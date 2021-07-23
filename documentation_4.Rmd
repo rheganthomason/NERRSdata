@@ -1,0 +1,343 @@
+---
+
+title: "Documentation_2"
+output: 
+  html_document: {toc: true, toc_float: true,
+  toc_depth: 2}
+  
+---
+
+# PEP Project
+
+## Dissolved Oxygen (mg/L) {.tabset}
+
+### All years
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(SWMPr)
+#remotes::install_github("NOAA-EDAB/ecodata")
+
+## import the data from the stations
+raw_dat <- bind_rows(
+  import_local(here::here("data-raw/wq"), station_code = "nartswq") %>% 
+    qaqc() %>% 
+    mutate(station = "nartswq"),
+  import_local(here::here("data-raw/wq"), station_code = "wqbmpwq") %>% 
+    qaqc() %>% 
+    mutate(station = "wqbmpwq"),
+  import_local(here::here("data-raw/wq"), station_code = "welinwq") %>% 
+    qaqc() %>% 
+    mutate(station = "welinwq"),
+  import_local(here::here("data-raw/wq"), station_code = "grbgbwq") %>% 
+    qaqc() %>% 
+    mutate(station = "grbgbwq"))
+
+#make a new dataframe, with new mean_daily columns, NA's added, etc.
+daily <- raw_dat %>% 
+  mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>%
+  select(date,
+         station,
+         Temp = temp, 
+         Sal = sal, 
+         DO_Pct = do_pct, 
+         DO_mgl = do_mgl) %>%
+  pivot_longer(cols = c("Temp", "Sal", "DO_Pct", "DO_mgl"), names_to = "Variable", values_to = "value") %>% 
+  group_by(station, Variable, date) %>%
+  summarize(mean_daily = mean(value, na.rm = TRUE),
+            mean_daily = ifelse(is.nan(mean_daily),
+                                NA_real_,
+                                mean_daily))
+
+# thresholds for all the variables
+rmdomgl<-daily %>% group_by(station) %>%
+  filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15 | is.na(mean_daily))
+
+rmdopct<-daily %>% group_by(station) %>%
+  filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 | is.na(mean_daily))
+
+rmtemp<-daily %>% group_by(station) %>%
+  filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 | is.na(mean_daily))
+
+rmsal<-daily %>% group_by(station) %>%
+  filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 | is.na(mean_daily))
+
+monthly <- rbind(rmdomgl, rmdopct, rmtemp, rmsal)
+
+#so you don't have to name each one
+station_names <- as_labeller(
+  c('nartswq' = "Narragansett",
+    "wqbmpwq"= "Waquoit Bay",
+    "welinwq" = "Wells Bay", 
+    "grbgbwq" = "Great Bay"))
+
+#make a month year column to be easier, if more than 10 days of no data, takes them out.(NA)
+dat_month <- monthly %>%
+  mutate(month_year = format(as.Date(date), "%Y-%m")) %>%
+  group_by(station, month_year, Variable, grp = with(rle(!is.na(mean_daily)), 
+                                                     rep(seq_along(lengths),
+                                                         lengths))) %>%
+  mutate(counter = 1:n()) %>%
+  ungroup() %>%
+  select(-grp) %>%
+  group_by(station, month_year, Variable) %>%
+  mutate(mean_month = ifelse(max(counter) >= 10,
+                             mean(mean_daily, na.rm = TRUE),
+                             NA_real_),
+         mean_month = ifelse(is.nan(mean_month),
+                             NA_real_,
+                             mean_month),
+         date = as.Date(paste0(month_year, "-1"))) %>% 
+  select(month_year, date, station, Variable, mean_month) %>%
+  distinct(.keep_all = TRUE)
+
+dat_month %>% 
+  filter(Variable == "DO_mgl") %>%
+  ggplot(aes(date, mean_month))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)") +
+  facet_wrap(.~station, labeller = station_names) + 
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
+```
+
+## Dissolved Oxygen (%) {.tabset}
+
+### All Years
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+dat_month %>% 
+  filter(Variable == "DO_Pct") %>%
+  ggplot(aes(date, mean_month))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(50, 120)+
+  labs(x = "Year", y = "Dissolved Oxygen Concentration (%)") +
+  facet_wrap(.~station, labeller = station_names) + 
+  ecodata::theme_ts()+
+  theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 8), axis.title = element_text(size = 10))
+```
+
+## Temperature {.tabset}
+
+### All Years
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+dat_month %>% 
+  filter(Variable == "Temp") %>%
+  ggplot(aes(date, mean_month))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 30)+
+  labs(x = "Year", y = "Temperature (C)") +
+  facet_wrap(.~station, labeller = station_names) + 
+  ecodata::theme_ts()+
+  theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 8), axis.title = element_text(size = 10))
+```
+
+### Max/Min/Span
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+maxtemp_all <- dat_month %>% mutate(year = lubridate::year(date)) %>% 
+  group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
+  summarise(maxtemp = max(mean_month)) %>% ungroup()
+
+mintemp_all <- dat_month %>% mutate(year = lubridate::year(date)) %>% 
+  group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
+  summarise(mintemp = min(mean_month)) %>% ungroup()
+
+spantemp_all <- dat_month %>% mutate(year = lubridate::year(date)) %>% 
+  group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
+  summarise(spantemp = max(mean_month)-min(mean_month)) %>%  ungroup()
+
+ggplot()+
+  geom_point(data = maxtemp_all, aes(year, maxtemp, color = "a"))+
+  geom_point(data = mintemp_all, aes(year, mintemp, color = "b"))+
+  geom_point(data = spantemp_all, aes(year, spantemp, color = "c"))+
+  scale_colour_manual(values = c("green", "steelblue", "palevioletred"),
+                      labels = c("Max Temp", "Min Temp", "Span" ))+
+  labs(x = "", y = "Temperature (C)")+
+  ylim(0, 30)+
+  geom_smooth(data = maxtemp_all, aes(year, maxtemp), method = "lm", color = "green", se = F)+
+  geom_smooth(data = mintemp_all, aes(year, mintemp), method = "lm", color = "steelblue", se = F)+
+  geom_smooth(data = spantemp_all, aes(year, spantemp), method = "lm", color = "palevioletred", se = F)+
+  facet_wrap(.~station, labeller = station_names) +
+  theme(legend.title = element_blank())+
+  ecodata::theme_ts()
+```
+
+## Salinity {.tabset}
+
+### All Years
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+dat_month %>% 
+  filter(Variable == "Sal") %>%
+  ggplot(aes(date, mean_month))+
+  geom_point(color = "lightblue")+
+  geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(20, 32)+
+  labs(x = "Year", y = "Salinity (psu)") +
+  facet_wrap(.~station, labeller = station_names) +
+  ecodata::theme_ts()+
+  theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 9), axis.title = element_text(size = 10))
+```
+
+## Chlorophyll {.tabset}
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+chloro_nutri <- read_csv(here::here("data/nutrient_pep.csv"))
+dailynut <- chloro_nutri %>% 
+  group_by(station, Variable, date) %>%
+  summarize(mean_daily = mean(mean_daily, na.rm = TRUE),
+            mean_daily = ifelse(is.nan(mean_daily),
+                                NA_real_,
+                                mean_daily))
+
+rmchla <-dailynut %>% group_by(station) %>%
+  filter(Variable == "CHLA_N" & mean_daily > 0 & mean_daily < 60 | is.na(mean_daily))
+
+station_names <- as_labeller(
+  c('nartsnut' = "Narragansett",
+    "welinnut" = "Wells Bay", 
+    "grbgbnut" = "Great Bay"))
+
+rmchla %>% 
+  ggplot(aes(date, mean_daily))+
+  geom_point(color = "darkblue", size = 2)+
+  #geom_smooth(method = "loess", span = 0.08, color = "steelblue", se = F)+
+  geom_line(group = "1", color = "steelblue")+
+  scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 15)+
+  labs(x = "Year", y = "Chlorophyll Concentration (µg/L)") +
+  facet_wrap(.~station, labeller = station_names) + 
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
+```
+
+## Climatologies {.tabset}
+
+### Dissolved Oxygen (mg/L)
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+raw.dir <- here::here("data")
+daily_csv <-"water_quality_pep.csv"
+daily1 <- read_csv(file.path(raw.dir,daily_csv))
+dailyyear <- daily1 %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+                              year = lubridate::year(date))
+
+rmdomgl_clim <-dailyyear %>% filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
+
+rmdopct_clim <-dailyyear %>% filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
+
+rmtemp_clim <-dailyyear %>% filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
+
+rmsal_clim <-dailyyear %>% filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% ungroup()
+
+monthly_clim <- rbind(rmdomgl_clim, rmdopct_clim, rmtemp_clim, rmsal_clim)
+
+## only 2020 points
+rmdomgl2020 <-dailyyear %>% filter(Variable == "DO_mgl" & mean_daily > 0 & mean_daily < 15 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmdopct2020 <-dailyyear %>% filter(Variable == "DO_Pct" & mean_daily > 50 & mean_daily < 120 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmtemp2020 <-dailyyear %>% filter(Variable == "Temp" & mean_daily > 0 & mean_daily < 30 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+rmsal2020 <-dailyyear %>% filter(Variable == "Sal" & mean_daily > 0 & mean_daily < 32 | is.na(mean_daily)) %>% 
+  group_by(month, Variable, station, year) %>% 
+  summarise(mean_month = mean(mean_daily), sd_month = sd(mean_daily)) %>% filter(year == 2020) %>% ungroup()
+
+monthly_clim %>% 
+  filter(Variable == "DO_mgl") %>% 
+  ggplot(aes(month, mean_month))+
+  geom_point(color = "steelblue", size = 2)+
+  geom_line(group = "1", color = "steelblue")+
+  geom_errorbar(aes(ymin=mean_month-sd_month, ymax=mean_month+sd_month), width=.2,
+                position=position_dodge(0.05), color = "steelblue")+
+  geom_point(data = rmdomgl2020 %>% filter(Variable == "DO_mgl"), aes(month, mean_month), color = "red", size = 2)+
+  geom_line(data = rmdomgl2020, aes(month, mean_month, group = "1"), color = "red")+
+  ylim(0, 15)+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "DO (mg/L) - Monthly")+
+  facet_wrap(.~station, labeller = station_names) +
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
+```
+
+### Dissolved Oxygen (%)
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+monthly_clim %>% 
+  filter(Variable == "DO_Pct") %>% 
+  ggplot(aes(month, mean_month))+
+  geom_point(color = "steelblue", size = 2)+
+  geom_line(group = "1", color = "steelblue")+
+  geom_errorbar(aes(ymin=mean_month-sd_month, ymax=mean_month+sd_month), width=.2,
+                position=position_dodge(0.05), color = "steelblue")+
+  geom_line(data = rmdopct2020, aes(month, mean_month, group = "1"), color = "red")+
+  ylim(50, 120)+
+  labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "DO (%) - Monthly")+
+  facet_wrap(.~station, labeller = station_names) +
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
+```
+
+### Temperature
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+monthly_clim %>% 
+  filter(Variable == "Temp") %>% 
+  ggplot(aes(month, mean_month))+
+  geom_point(color = "steelblue", size = 2)+
+  geom_line(group = "1", color = "steelblue")+
+  geom_errorbar(aes(ymin=mean_month-sd_month, ymax=mean_month+sd_month), width=.2,
+                position=position_dodge(0.05), color = "steelblue")+
+  geom_point(data = rmtemp2020 %>% filter(Variable == "Temp"), aes(month, mean_month), color = "red", size = 2)+
+  geom_line(data = rmtemp2020, aes(month, mean_month, group = "1"), color = "red")+
+  ylim(0, 30)+
+  labs(x = "", y = "Temperature (C)", title = "Temperature - Monthly")+
+  facet_wrap(.~station, labeller = station_names) +
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
+```
+
+### Salinity 
+
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+monthly_clim %>% 
+  filter(Variable == "Sal") %>% 
+  ggplot(aes(month, mean_month))+
+  geom_point(color = "steelblue", size = 2)+
+  geom_line(group = "1", color = "steelblue")+
+  geom_errorbar(aes(ymin=mean_month-sd_month, ymax=mean_month+sd_month), width=.2,
+                position=position_dodge(0.05), color = "steelblue")+
+  geom_point(data = rmsal2020 %>% filter(Variable == "Sal"), aes(month, mean_month), color = "red", size = 2)+
+  geom_line(data = rmsal2020, aes(month, mean_month, group = "1"), color = "red")+
+  ylim(10, 32)+
+  labs(x = "", y = "Salinity (psu)", title = "Salinity - Monthly")+
+  facet_wrap(.~station, labeller = station_names) +
+  ecodata::theme_ts()+
+  theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
+```

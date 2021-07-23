@@ -153,7 +153,7 @@ dat_month %>%
 ### Only 2020
 
 ``` {r, message=FALSE, echo=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
-nartsmonth %>% 
+narmonth %>% 
   filter(Variable == "DO_mgl") %>% filter(date >= "2020-01-01") %>% 
   ggplot(aes(date, mean_daily))+
   geom_point(color = "lightblue")+

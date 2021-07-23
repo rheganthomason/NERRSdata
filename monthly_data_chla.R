@@ -12,9 +12,10 @@ grbnut <- chloro_nutri %>% filter(station == "grbgbnut") %>%
 nartsnut%>% 
   filter(Variable == "CHLA_N") %>% 
   ggplot(aes(date, mean_daily))+
-  geom_point(color = "lightblue")+
-  geom_line(color = "steelblue")+
+  geom_point(color = "purple", size = 2)+
+  geom_smooth(method = "loess", se = F, span = 0.15, color = "steelblue")+
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
+  ylim(0, 10)+
   labs(x = "Year", y = "Chlorophyll concentration (µg/L)", title = "Narraganset Chlorophyll Concentration")+
   ecodata::theme_ts()
 

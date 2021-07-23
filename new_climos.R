@@ -2,7 +2,7 @@
 
 ## Nar clim start
 #seperate out nar station
-narclim <- monthly %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+narclim <- dailyyear %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
                               year = lubridate::year(date)) %>% filter(station == "nartswq") %>% ungroup()
 
 #use 2020 data for red points
@@ -58,7 +58,7 @@ onlymonthnarclim %>%
   ecodata::theme_ts()
 
 ## great bay start 
-grbclim <- monthly %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+grbclim <- dailyyear %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
                               year = lubridate::year(date)) %>% filter(station == "grbgbwq") %>% ungroup()
 
 #use 2020 data for red points
@@ -79,6 +79,8 @@ onlymonthgrbclim %>%
   geom_point(color = "lightblue")+
   geom_errorbar(aes(ymin=meanmonth-meansd, ymax=meanmonth+meansd), width=.2,
                 position=position_dodge(0.05), color = "steelblue")+
+  xlim("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")+
+  ylim(0, 15)+
   geom_point(data = allyeargrbclim %>% filter(Variable == "DO_mgl"), aes(month, meanmonth), color = "red", size = 2)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "Great Bay DO (mg/L) - Climatology")+
   ecodata::theme_ts()
@@ -89,6 +91,7 @@ onlymonthgrbclim %>%
   geom_point(color = "lightblue")+
   geom_errorbar(aes(ymin=meanmonth-meansd, ymax=meanmonth+meansd), width=.2,
                 position=position_dodge(0.05), color = "steelblue")+
+  xlim("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")+
   geom_point(data = allyeargrbclim %>% filter(Variable == "DO_Pct"), aes(month, meanmonth), color = "red", size = 2)+
   labs(x = "", y = "Dissolved Oxygen Concentration (%)", title = "Great Bay DO (%) - Climatology")+
   ecodata::theme_ts()
@@ -99,6 +102,7 @@ onlymonthgrbclim %>%
   geom_point(color = "lightblue")+
   geom_errorbar(aes(ymin=meanmonth-meansd, ymax=meanmonth+meansd), width=.2,
                 position=position_dodge(0.05), color = "steelblue")+
+  xlim("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")+
   geom_point(data = allyeargrbclim %>% filter(Variable == "Sal"), aes(month, meanmonth), color = "red", size = 2)+
   labs(x = "", y = "Salinity (psu)", title = "Great Bay Salinity - Climatology")+
   ecodata::theme_ts()
@@ -109,12 +113,13 @@ onlymonthgrbclim %>%
   geom_point(color = "lightblue")+
   geom_errorbar(aes(ymin=meanmonth-meansd, ymax=meanmonth+meansd), width=.2,
                 position=position_dodge(0.05), color = "steelblue")+
+  xlim("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")+
   geom_point(data = allyeargrbclim %>% filter(Variable == "Temp"), aes(month, meanmonth), color = "red", size = 2)+
   labs(x = "", y = "Temperature (C)", title = "Great Bay Temperature - Climatology")+
   ecodata::theme_ts()
 
 ## start of waquoit
-waqclim <- monthly %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+waqclim <- dailyyear %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
                               year = lubridate::year(date)) %>% filter(station == "wqbmpwq") %>% ungroup()
 
 #use 2020 data for red points
@@ -170,7 +175,7 @@ onlymonthwaqclim %>%
   ecodata::theme_ts()
 
 ## start of wells
-welclim <- monthly %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
+welclim <- dailyyear %>% mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE),
                               year = lubridate::year(date)) %>% filter(station == "welinwq") %>% ungroup()
 
 #use 2020 data for red points
