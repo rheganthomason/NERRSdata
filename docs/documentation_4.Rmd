@@ -206,7 +206,7 @@ dailynut <- chloro_nutri %>%
 rmchla <-dailynut %>% group_by(station) %>%
   filter(Variable == "CHLA_N" & mean_daily > 0 & mean_daily < 60 | is.na(mean_daily))
 
-station_names <- as_labeller(
+station_names_nut <- as_labeller(
   c('nartsnut' = "Narragansett",
     "welinnut" = "Wells Bay", 
     "grbgbnut" = "Great Bay"))
@@ -219,9 +219,9 @@ rmchla %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(0, 15)+
   labs(x = "Year", y = "Chlorophyll Concentration (µg/L)") +
-  facet_wrap(.~station, labeller = station_names) + 
+  facet_wrap(.~station, labeller = station_names_nut) + 
   ecodata::theme_ts()+
-  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
+  theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```
 
 ## Climatologies {.tabset}
