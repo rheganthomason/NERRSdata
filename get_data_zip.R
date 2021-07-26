@@ -6,54 +6,101 @@ library(tidyverse)
 
 ###################################################################
 ####  NUTRIENTS ###################################################
-###################################################################
-nut<- list.files(here::here("data-raw/nut"))
-#i = "grbgbnut2007.csv"
-nut.out<- data.frame()
-for (i in nut){
-
-  df<- as_tibble(read.csv(here::here("data-raw/nut",i))) 
-  
-  StationCode <- unique(df$StationCode)
-  
-  rawdata<- df %>% dplyr::select(-X, -StationCode,-isSWMP,-Historical,-ProvisionalPlus,-F_Record)
-  
-  data <- rawdata %>% 
-    dplyr::select(DateTimeStamp,!(dplyr::starts_with("F_"))) %>%
-    tidyr::pivot_longer(.,cols=-DateTimeStamp,names_to = "Variable",values_to = "Value")
-  
-  ratings <- rawdata %>%
-    dplyr::select(DateTimeStamp,dplyr::starts_with("F_")) %>%
-    dplyr::rename_with(stringr::str_replace, 
-                       pattern="F_",
-                       replacement = "") %>% 
-    tidyr::pivot_longer(.,cols=-DateTimeStamp,names_to = "Variable",values_to = "Value")
-  
-  mainTable <- data %>% dplyr::left_join(.,ratings,by = c("DateTimeStamp","Variable")) %>%
-    dplyr::rename(Value = Value.x, Rating = Value.y) %>% 
-    dplyr::mutate(Rating = stringr::str_remove_all(Rating,c("<|>|\\([A-Z]{3}\\)|\\[[A-Z]{3}\\]"))) %>%
-    dplyr::mutate(Rating = as.numeric(Rating)) %>% 
-    drop_na() %>% 
-    filter(Rating == c(0,3,5)) %>% 
-    mutate(dateonly = stringr::str_extract(DateTimeStamp, "^.{10}"),
-           date = lubridate::mdy(dateonly,tz="EST")) %>% 
-    group_by(date, Variable) %>% 
-    summarise(mean_daily = mean(Value)) %>% 
-    ungroup() %>% 
-    mutate(station = c(StationCode))
-    
-  nut.out<- rbind(nut.out, mainTable)
-  
-}
 
 
-write.csv(nut.out, file = "data/nutrients_all.csv")
+raw_dat <- bind_rows(
+  import_local(here::here("data-raw/nut"), station_code = "nartsnut") %>% 
+    qaqc() %>% 
+    mutate(station = "nartsnut"),
+  import_local(here::here("data-raw/nut"), station_code = "wqbmpnut") %>% 
+    qaqc() %>% 
+    mutate(station = "wqbmpnut"),
+  import_local(here::here("data-raw/nut"), station_code = "welinnut") %>% 
+    qaqc() %>% 
+    mutate(station = "welinnut"),
+  import_local(here::here("data-raw/nut"), station_code = "grbgbnut") %>% 
+    qaqc() %>% 
+    mutate(station = "grbgbnut"))
 
-dat<- read_csv(here::here("data", "nutrients_all.csv"))
-nut_pep<- dat %>% 
-  filter(station == c("grbgbnut", "nartsnut","wqbmpnut", "welinnut" )) 
-write.csv(nut_pep, file = "data/nutrient_pep.csv")
+daily_nut <- raw_dat %>% 
+  mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>%
+  select(date,
+         station,
+         po4f = po4f, 
+         nh4f = nh4f, 
+         no2f = no2f,
+         no23f = no23f, 
+         chla_n = chla_n, 
+         no3f = no3f) %>%
+  pivot_longer(cols = c("chla_n", "po4f", "nh4f", "no2f", "no3f", "no23f"), names_to = "Variable", values_to = "value") %>% 
+  group_by(station, Variable, date) %>%
+  summarize(mean_daily = mean(value, na.rm = TRUE),
+            mean_daily = ifelse(is.nan(mean_daily),
+                                NA_real_,
+                                mean_daily))
 
+
+# daily %>% filter(Variable == "chla_n") %>% 
+#   ggplot(aes(x= date, y = mean_daily))+
+#   geom_point()+
+#   facet_wrap(.~station)
+
+write.csv(daily_nut, file = "data/nutrients_pep.csv")
+
+
+
+# ###################################################################
+# nut<- list.files(here::here("data-raw/nut"))
+# #i = "grbgbnut2007.csv"
+# nut.out<- data.frame()
+# for (i in nut){
+# 
+#   df<- as_tibble(read.csv(here::here("data-raw/nut",i))) 
+#   
+#   StationCode <- unique(df$StationCode)
+#   
+#   rawdata<- df %>% dplyr::select(-X, -StationCode,-isSWMP,-Historical,-ProvisionalPlus,-F_Record)
+#   
+#   data <- rawdata %>% 
+#     dplyr::select(DateTimeStamp,!(dplyr::starts_with("F_"))) %>%
+#     tidyr::pivot_longer(.,cols=-DateTimeStamp,names_to = "Variable",values_to = "Value")
+#   
+#   ratings <- rawdata %>%
+#     dplyr::select(DateTimeStamp,dplyr::starts_with("F_")) %>%
+#     dplyr::rename_with(stringr::str_replace, 
+#                        pattern="F_",
+#                        replacement = "") %>% 
+#     tidyr::pivot_longer(.,cols=-DateTimeStamp,names_to = "Variable",values_to = "Value")
+#   
+#   mainTable <- data %>% dplyr::left_join(.,ratings,by = c("DateTimeStamp","Variable")) %>%
+#     dplyr::rename(Value = Value.x, Rating = Value.y) %>% 
+#     dplyr::mutate(Rating = stringr::str_remove_all(Rating,c("<|>|\\([A-Z]{3}\\)|\\[[A-Z]{3}\\]"))) %>%
+#     dplyr::mutate(Rating = as.numeric(Rating)) %>% 
+#     drop_na() %>% 
+#     filter(Rating == c(0,3,5)) %>% 
+#     mutate(dateonly = stringr::str_extract(DateTimeStamp, "^.{10}"),
+#            date = lubridate::mdy(dateonly,tz="EST")) %>% 
+#     group_by(date, Variable) %>% 
+#     summarise(mean_daily = mean(Value)) %>% 
+#     ungroup() %>% 
+#     mutate(station = c(StationCode))
+#     
+#   nut.out<- rbind(nut.out, mainTable)
+#   
+# }
+# 
+# 
+# write.csv(nut.out, file = "data/nutrients_all.csv")
+# 
+# dat<- read_csv(here::here("data", "nutrients_all.csv"))
+# nut_pep<- dat %>% 
+#   filter(station == c("grbgbnut", "nartsnut","wqbmhnut", "welinnut" )) 
+# write.csv(nut_pep, file = "data/nutrient_pep.csv")
+# 
+# nut_pep %>% filter(Variable == "CHLA_N") %>% 
+#   ggplot(aes(x = date, y = mean_daily))+
+#   geom_point()+
+#   facet_wrap(.~station)
 
 ###################################################################
 ####  WATER QUALITY ###############################################
