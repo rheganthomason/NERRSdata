@@ -9,6 +9,62 @@ output:
 
 # PEP Project
 
+## Map of stations
+```{r, message=FALSE, echo=FALSE, warning=FALSE}
+ library(sf)
+ library(SWMPr)
+ library(tidyverse)
+ library(ggrepel)
+ library(raster)
+ #install.packages(rgdal)
+ library(rgdal)
+
+
+ grb.codes <- SWMPr::site_codes() %>%
+   dplyr::filter(nerr_site_id == c("grb"))
+ nar.codes <- SWMPr::site_codes() %>%
+   dplyr::filter(nerr_site_id == c("nar"))
+ wel.codes <- SWMPr::site_codes() %>%
+   dplyr::filter(nerr_site_id == c("wel"))
+ wqb.codes <- SWMPr::site_codes() %>%
+   dplyr::filter(nerr_site_id == c("wqb"))
+
+ codes <- rbind(grb.codes, nar.codes, wel.codes, wqb.codes) %>%
+   dplyr::mutate(latitude = as.numeric(latitude),#
+                  longitude = as.numeric(longitude)*-1)
+ 
+ site_labels <- codes %>%
+   group_by(reserve_name) %>%
+   slice(1)
+
+ crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77+x_0=0
+ +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+ coast_shp <- rgdal::readOGR(file.path(here::here("data-raw","coast", "USA.shp")), verbose = F)
+ crs(coast_shp) <- crs
+ coast_sf <- as(coast_shp, "sf")
+
+ xmin = -72
+ xmax = -69
+ ymin = 41
+ ymax = 44
+ xlims <- c(xmin, xmax)
+ ylims <- c(ymin, ymax)
+ crs <- "+proj=longlat +lat_1=35 +lat_2=45 +lat_0=40 +lon_0=-77 +x_0=0 +y_0=0 +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
+ m <- ggplot()+
+   ggplot2::geom_sf(data = coast_sf) +
+   ggplot2::coord_sf(crs = crs, xlim = xlims, ylim = ylims)+
+   geom_point(aes(longitude, latitude), data = site_labels, color = "midnightblue", size = 2)+
+   geom_label_repel(data = site_labels, aes( longitude, latitude, label = reserve_name),
+                    size = 3)
+ xbreaks <- seq(-72, -69, 1)
+ ybreaks <- pretty(codes$latitude)
+ xlabels <- paste0(abs(xbreaks), "°W")
+ ylabels <- paste0(abs(ybreaks), "°N")
+ m + scale_x_continuous(breaks = xbreaks, labels = xlabels)+
+   scale_y_continuous(breaks = ybreaks, labels = ylabels)+
+      labs(x = NULL, y = NULL, title = "NERRs - New England Sites")
+```
+
 ## Dissolved Oxygen (mg/L) {.tabset}
 
 ### All years
@@ -93,7 +149,7 @@ dat_month <- monthly %>%
   select(month_year, date, station, Variable, mean_month) %>%
   distinct(.keep_all = TRUE)
 
-dat_month$station <- factor(dat_month$station, levels = c("welinwq","grbgbwq","wqbmpwq","nartswq"), 
+dat_month$station <- factor(dat_month$station, levels = c("welinwq","grbgbwq","wqbmpwq","nartswq"),
                   labels = c("Wells Bay", "Great Bay", "Waquoit Bay", "Narraganset"))
 
 dat_month %>% 
@@ -104,7 +160,7 @@ dat_month %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(0, 15)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (mg/L)") +
-  facet_wrap(.~station) +
+  facet_grid(.~station) +
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
 ```
@@ -122,7 +178,7 @@ dat_month %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(50, 120)+
   labs(x = "Year", y = "Dissolved Oxygen Concentration (%)") +
-  facet_wrap(.~station) +
+  facet_grid(.~station) +
   ecodata::theme_ts()+
   theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -140,7 +196,7 @@ dat_month %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(0, 30)+
   labs(x = "Year", y = "Temperature (C)") +
-  facet_wrap(.~station) +
+  facet_grid(.~station) +
   ecodata::theme_ts()+
   theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -171,7 +227,7 @@ ggplot()+
   geom_smooth(data = maxtemp_all, aes(year, maxtemp), method = "lm", color = "green", se = F)+
   geom_smooth(data = mintemp_all, aes(year, mintemp), method = "lm", color = "steelblue", se = F)+
   geom_smooth(data = spantemp_all, aes(year, spantemp), method = "lm", color = "palevioletred", se = F)+
-  facet_wrap(.~station, labeller = station_names) +
+  facet_grid(.~station, labeller = station_names) +
   theme(legend.title = element_blank())+
   ecodata::theme_ts()
 ```
@@ -189,7 +245,7 @@ dat_month %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(20, 32)+
   labs(x = "Year", y = "Salinity (psu)") +
-  facet_wrap(.~station) +
+  facet_grid(.~station) +
   ecodata::theme_ts()+
   theme(axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 9), axis.title = element_text(size = 10))
 ```
@@ -208,6 +264,9 @@ dailynut <- chloro_nutri %>%
 rmchla <-dailynut %>% group_by(station) %>%
   filter(Variable == "CHLA_N" & mean_daily > 0 & mean_daily < 60 | is.na(mean_daily))
 
+rmchla$station <- factor(rmchla$station, levels = c("welinwq","grbgbwq","wqbmpwq","nartswq"),
+                  labels = c("Wells Bay", "Great Bay", "Waquoit Bay", "Narraganset"))
+
 station_names_nut <- as_labeller(
   c('nartsnut' = "Narragansett",
     "welinnut" = "Wells Bay", 
@@ -221,7 +280,7 @@ rmchla %>%
   scale_x_date(date_labels = "%y", date_breaks = "1 year")+
   ylim(0, 15)+
   labs(x = "Year", y = "Chlorophyll Concentration (µg/L)") +
-  facet_wrap(.~station, labeller = station_names_nut) + 
+  facet_grid(.~station) + 
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -283,7 +342,7 @@ monthly_clim %>%
   geom_line(data = rmdomgl2020, aes(month, mean_month, group = "1"), color = "red")+
   ylim(0, 15)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "DO (mg/L) - Monthly")+
-  facet_wrap(.~station, labeller = station_names) +
+  facet_grid(.~station, labeller = station_names) +
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -301,7 +360,7 @@ monthly_clim %>%
   geom_line(data = rmdopct2020, aes(month, mean_month, group = "1"), color = "red")+
   ylim(50, 120)+
   labs(x = "", y = "Dissolved Oxygen Concentration (mg/L)", title = "DO (%) - Monthly")+
-  facet_wrap(.~station, labeller = station_names) +
+  facet_grid(.~station, labeller = station_names) +
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -320,7 +379,7 @@ monthly_clim %>%
   geom_line(data = rmtemp2020, aes(month, mean_month, group = "1"), color = "red")+
   ylim(0, 30)+
   labs(x = "", y = "Temperature (C)", title = "Temperature - Monthly")+
-  facet_wrap(.~station, labeller = station_names) +
+  facet_grid(.~station, labeller = station_names) +
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```
@@ -339,7 +398,7 @@ monthly_clim %>%
   geom_line(data = rmsal2020, aes(month, mean_month, group = "1"), color = "red")+
   ylim(10, 32)+
   labs(x = "", y = "Salinity (psu)", title = "Salinity - Monthly")+
-  facet_wrap(.~station, labeller = station_names) +
+  facet_grid(.~station, labeller = station_names) +
   ecodata::theme_ts()+
   theme(axis.text = element_text(size = 8), axis.title = element_text(size = 10))
 ```

@@ -2,19 +2,19 @@
 
 ##max temp time series
 #average of all data across all years
-maxtemp_all <- dat_month %>% mutate(year = lubridate::year(date) %>% 
+maxtemp_all <- monthly %>% mutate(year = lubridate::year(date)) %>% 
   group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
-  summarise(maxtemp = max(mean_month)) %>% ungroup()
+  summarise(maxtemp = max(mean_daily)) %>% ungroup()
 
 ## min temp time series
-mintemp_all <- dat_month %>% mutate(year = lubridate::year(date)) %>% 
+mintemp_all <- monthly %>% mutate(year = lubridate::year(date)) %>% 
   group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
-  summarise(mintemp = min(mean_month)) %>% ungroup()
+  summarise(mintemp = min(mean_daily)) %>% ungroup()
 
 ## span time series
-spantemp_all <- dat_month %>% mutate(year = lubridate::year(date)) %>% 
+spantemp_all <- monthly %>% mutate(year = lubridate::year(date)) %>% 
   group_by(Variable, station, year) %>% filter(Variable == "Temp") %>% 
-  summarise(spantemp = max(mean_month)-min(mean_month)) %>%  ungroup()
+  summarise(spantemp = max(mean_daily)-min(mean_daily)) %>%  ungroup()
 
 ggplot()+
   geom_point(data = maxtemp_all, aes(year, maxtemp, color = "a"))+
