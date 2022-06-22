@@ -1,0 +1,124 @@
+---
+title: 'GAM meta analysis data exploration'
+author: "Kimberly Bastille"
+date: "6/22/2022"
+output: html_document
+---
+
+### is there enough data?
+
+Below is a summary of the data comparisons between the Beck et. al 2022 paper and the NERRS data. 
+
+| Parameter |  Beck et. al 2022 | NERRS data from stations used in Rhegan's Analysis |
+|---------------|------------------|-------------------------------------------------|
+| Time Series Length | 30 years (1990 - 2019) | 15 years (2007 - 2019) * earlier samples removed due to poor qaqc scores |
+| Number of total samples | 414 - 608 samples per station | 34 - 470 *greatest from Wells Bay |
+| Seasons available | ALL | Summer *due to ice cover summer was the season most likely to show trends with enough data |
+
+Summary tables describing data from New England NERRS stations. (welinnut = Wells Bay ME, grbgbnut = Great Bay NH, wqbmpnut = Waquoit Bay MA, nartsnut = Narragansett RI) 
+
+```{r, echo=FALSE,  message=FALSE, warning=FALSE}
+library(tidyverse)
+library(SWMPr)
+raw_dat <- bind_rows(
+  import_local(here::here("data-raw/nut"), station_code = "nartsnut") %>% 
+    qaqc() %>% 
+    mutate(station = "nartsnut"),
+  import_local(here::here("data-raw/nut"), station_code = "wqbmpnut") %>% 
+    qaqc() %>% 
+    mutate(station = "wqbmpnut"),
+  import_local(here::here("data-raw/nut"), station_code = "welinnut") %>%
+    qaqc() %>%
+    mutate(station = "welinnut"),
+  import_local(here::here("data-raw/nut"), station_code = "grbgbnut") %>%
+    qaqc() %>%
+    mutate(station = "grbgbnut"))
+```
+
+#### Station Data Summary
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+total_nut <- raw_dat %>% 
+  mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
+  select(date,
+         station,
+         #po4f = po4f, 
+         #nh4f = nh4f, 
+         #no2f = no2f,
+         #no23f = no23f, 
+         chla_n = chla_n) %>% #, %>% 
+         #no3f = no3f) %>%
+  #pivot_longer(cols = c(chla_n), 
+  #             names_to = "Variable", values_to = "value") %>% 
+  dplyr::mutate(month = lubridate::month(date), 
+                year = lubridate::year(date))%>%
+  dplyr::filter(month > 5, 
+                month < 9) %>% 
+  group_by(station) %>%
+  dplyr::filter(!chla_n == "NA") %>% 
+  summarise(Number_of_Stations = length(chla_n), 
+            Years_Missing = c())
+years_missing <- data.frame(station = c("grbgbnut", "nartsnut", "welinnut", "wqbmpnut"),
+                            Years_Missing = c("2009,2010,2014,2015,2016,2017", 
+                                             "2008.2009,2010", 
+                                             "2016", 
+                                             "2014"))
+dat_tot <- total_nut %>%  left_join(years_missing)
+knitr::kable(dat_tot)
+
+```
+
+#### Seasonal Data Summary
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+seasonal_nut <- raw_dat %>% 
+  mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
+  select(date,
+         station,
+         #po4f = po4f, 
+         #nh4f = nh4f, 
+         #no2f = no2f,
+         #no23f = no23f, 
+         chla_n = chla_n) %>% #, %>% 
+         #no3f = no3f) %>%
+  #pivot_longer(cols = c(chla_n), 
+  #             names_to = "Variable", values_to = "value") %>% 
+  dplyr::mutate(month = lubridate::month(date), 
+                year = lubridate::year(date))%>%
+  dplyr::filter(month > 5, 
+                month < 9) %>% 
+  group_by(station, year) %>%
+  dplyr::filter(!chla_n == "NA") %>% 
+  summarize(N_stations = length(chla_n),
+            mean_seasonal = mean(chla_n), 
+            se_seasonal = sd(chla_n)/sqrt(N_stations)) 
+
+seasonal_nut %>% 
+  ggplot(aes(x = year, y = mean_seasonal, group = station, color = station))+
+  geom_point()+
+  geom_path()+
+  geom_errorbar(aes(ymin=mean_seasonal-se_seasonal, ymax=mean_seasonal+se_seasonal), width=.2)+
+  ggtitle("Chlorophyll A Summer Means for New England NERRs")
+
+seasonal_nut %>% 
+  dplyr::filter(!station == "nartsnut",
+                !station == "grbgbnut") %>% 
+  ggplot(aes(x = year, y = mean_seasonal))+
+  geom_point()+
+  geom_path()+
+  geom_errorbar(aes(ymin=mean_seasonal-se_seasonal, ymax=mean_seasonal+se_seasonal), width=.2)+
+  facet_grid(rows = vars(station), scales = "free")+
+  ggtitle("Chlorophyll A Summer Means for Wells (data rich) and Waquoit (data poor)")
+
+DT::datatable(seasonal_nut)
+
+```
+
+### GAM meta analysis
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+```
+
+

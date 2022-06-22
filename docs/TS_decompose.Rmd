@@ -1,0 +1,207 @@
+# Time series decompositon
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+### Decomposition Analysis
+library(tidyverse)
+library(readxl)
+library(stringr)
+library(readr)
+library(SWMPr)
+# Decompose DO 
+raw.dir <- here::here("data")
+daily_csv<-"water_quality_pep.csv"
+
+daily<-read_csv(file.path(raw.dir,daily_csv))
+daily <- daily %>%  filter(mean_daily > -50)
+data = daily
+Var = "Temp"
+Location = "nartswq"
+
+
+daily2<- daily %>% group_by(Variable, station) %>% complete(date = seq.Date(min(date), max(date), by="month")) %>% 
+  filter(Variable == "Temp") %>% 
+  mutate(month = lubridate::month(date))
+
+
+
+
+ monthly<- daily %>% 
+   mutate(month.year = format(date, "%Y-%m")) %>% 
+  group_by(month.year, Variable, station) %>% 
+  summarise(mean_monthly = mean(mean_daily)) %>% 
+  ungroup() %>% 
+  complete(month.year = seq.motnh.year(min(month.year), max(month.year), by="month")) 
+
+ seasonal<- monthly %>% 
+   separate(month.year, sep= "[-]", into = c("year", "month")) %>% 
+   mutate(season = recode(month,  "01" = 0.1, "02" = 0.1, "03" = 0.1, 
+                          "04" = 0.2,"05" = 0.2,"06" = 0.2,
+                          "07" = 0.3,"08" = 0.3,"09" = 0.3,
+                          "10" =  0.4,"11" = 0.4,"12" = 0.4), 
+          year = as.numeric(year), 
+          year.seas = year + season) %>% 
+   group_by(year.seas, Variable, station) %>% 
+  summarise(mean_season = mean(mean_monthly)) %>% 
+  ungroup() 
+   
+ 
+season.fill <- data.frame(year = rep(times = 4, c(2007:2020))) %>% 
+  sort(year)
+                          season = rep(times = 14, c(0.1, 0.2, 0.3, 0.4))) %>% 
+  mutate(year.seas = year + season)
+ 
+ 
+get_decomp_df<- function(data, Var, Location){ 
+ monthly<- data %>% dplyr::filter(Variable == Var, 
+                                  station == Location) %>%  
+   mutate(month.year = format(date, "%Y-%m")) %>% 
+  group_by(month.year) %>% 
+  summarise(mean_monthly = mean(mean_daily)) %>% 
+  ungroup() %>% 
+  dplyr::select(mean_monthly) 
+ 
+
+ dots<- ts(monthly, frequency = 12)
+ decomp.ts<- stats::decompose(dots)
+ #plot(decomp)
+ 
+ decomp.df<-   decomp.ts %>% 
+  unlist(recursive = FALSE) %>% 
+  enframe() %>% 
+  separate(name, 
+           into = c("name", "month"), 
+           sep = "(?<=[A-Za-z])(?=[0-9])") %>% 
+  drop_na(value) %>% 
+  dplyr::filter(name != "type", 
+                name != "figure") %>% 
+  dplyr::mutate(value = as.numeric(value), 
+                month = (as.numeric(month)), 
+                name = fct_relevel(name, 
+                                   "x", "trend", "seasonal", 
+                                   "random"))
+p1<-
+  ggplot(decomp.df, aes(x = month,  y = value))+
+  ggplot2::geom_line()+
+  #geom_smooth(method='lm', formula= y~x)+
+  ecodata::geom_gls()+
+  facet_wrap(name~., nrow = 4, scales = "free_y")+
+  #ggplot2::geom_vline(xintercept = 365, color = "red")+
+  ggplot2::ggtitle(paste(Location, Var, "decomposed"))
+p1
+
+}
+
+
+
+data = seasonal
+get_seasonal_decomp_df<- function(data, Var, Location){ 
+ seas<- data %>% dplyr::filter(Variable == Var, 
+                                  station == Location) %>% 
+  dplyr::select(mean_season) 
+ 
+
+ dots<- ts(seas, frequency = 4)
+ decomp.ts<- stats::decompose(dots)
+ #plot(decomp)
+ 
+ decomp.df<-   decomp.ts %>% 
+  unlist(recursive = FALSE) %>% 
+  enframe() %>% 
+  separate(name, 
+           into = c("name", "month"), 
+           sep = "(?<=[A-Za-z])(?=[0-9])") %>% 
+  drop_na(value) %>% 
+  dplyr::filter(name != "type", 
+                name != "figure") %>% 
+  dplyr::mutate(value = as.numeric(value), 
+                month = (as.numeric(month)), 
+                name = fct_relevel(name, 
+                                   "x", "trend", "seasonal", 
+                                   "random"))
+p1<-
+  ggplot(decomp.df, aes(x = month,  y = value))+
+  ggplot2::geom_line()+
+  #geom_smooth(method='lm', formula= y~x)+
+  ecodata::geom_gls()+
+  facet_wrap(name~., nrow = 4, scales = "free_y")+
+  #ggplot2::geom_vline(xintercept = 365, color = "red")+
+  ggplot2::ggtitle(paste(Location, Var, "decomposed"))
+p1
+
+}
+```
+
+## Water Quailty data quick plot 
+
+### Daily
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+daily %>% filter(Variable == "Temp") %>% 
+  ggplot(aes(x = date, y = mean_daily))+
+  geom_point()+
+  #geom_line()+
+  #geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci),  alpha = 0.5)+
+  facet_grid(station~Variable, scales = "free")
+```
+
+### Monthly
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+monthly %>% filter(Variable == "Temp") %>% 
+  ggplot(aes(x = month.year, y = mean_monthly))+
+  geom_point()+
+  geom_line()+
+  #geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci),  alpha = 0.5)+
+  facet_grid(station~Variable, scales = "free")
+```
+
+### Seasonally
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+seasonal %>% filter(Variable == "Temp", 
+                    station == "nartswq") %>% 
+  
+  ggplot(aes(x = season, y = mean_season,  color = year))+
+  geom_point()+
+  geom_line()+
+  #geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci),  alpha = 0.5)+
+  facet_grid(station~Variable, scales = "free")
+```
+
+
+
+## Decomsposed Monthly Temperature {.tabset .tabset-fade}
+
+
+### Narragansett
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+get_decomp_df(daily2, "Temp", "nartswq")
+
+```
+
+### Waquoit
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+get_decomp_df(daily, "Temp", "wqbmpwq")
+
+```
+
+
+### Great Bay
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+get_decomp_df(daily, "Temp", "grbgbwq")
+
+```
+
+### Wells 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+get_decomp_df(daily, "Temp", "welinwq")
+
+```
+

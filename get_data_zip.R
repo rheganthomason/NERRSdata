@@ -15,12 +15,12 @@ raw_dat <- bind_rows(
   import_local(here::here("data-raw/nut"), station_code = "wqbmpnut") %>% 
     qaqc() %>% 
     mutate(station = "wqbmpnut"),
-  import_local(here::here("data-raw/nut"), station_code = "welinnut") %>% 
-    qaqc() %>% 
-    mutate(station = "welinnut"),
-  import_local(here::here("data-raw/nut"), station_code = "grbgbnut") %>% 
-    qaqc() %>% 
-    mutate(station = "grbgbnut"))
+  import_local(here::here("data-raw/nut"), station_code = "welinnut") %>%
+   qaqc() %>%
+   mutate(station = "welinnut"),
+  import_local(here::here("data-raw/nut"), station_code = "grbgbnut") %>%
+   qaqc() %>%
+   mutate(station = "grbgbnut"))
 
 daily_nut <- raw_dat %>% 
   mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>%
@@ -47,8 +47,11 @@ daily_nut <- raw_dat %>%
 
 write.csv(daily_nut, file = "data/nutrients_pep.csv")
 
-
-
+dat<- read.csv(here::here("data/nutrients_pep.csv"))
+dat %>% filter(Variable == "chla_n") %>% 
+   ggplot(aes(x= date, y = mean_daily))+
+   geom_point()+
+   facet_wrap(.~station)
 # ###################################################################
 # nut<- list.files(here::here("data-raw/nut"))
 # #i = "grbgbnut2007.csv"
