@@ -5,13 +5,13 @@ date: "6/22/2022"
 output: html_document
 ---
 
-### is there enough data?
+### Data Summary
 
 Below is a summary of the data comparisons between the Beck et. al 2022 paper and the NERRS data. 
 
 | Parameter |  Beck et. al 2022 | NERRS data from stations used in Rhegan's Analysis |
 |---------------|------------------|-------------------------------------------------|
-| Time Series Length | 30 years (1990 - 2019) | 15 years (2007 - 2019) * earlier samples removed due to poor qaqc scores |
+| Time Series Length | 30 years (1990 - 2019) | 12 years (2007 - 2019) * earlier samples removed due to poor qaqc scores |
 | Number of total samples | 414 - 608 samples per station | 34 - 470 *greatest from Wells Bay |
 | Seasons available | ALL | Summer *due to ice cover summer was the season most likely to show trends with enough data |
 
@@ -20,6 +20,7 @@ Summary tables describing data from New England NERRS stations. (welinnut = Well
 ```{r, echo=FALSE,  message=FALSE, warning=FALSE}
 library(tidyverse)
 library(SWMPr)
+library(wqtrends)
 raw_dat <- bind_rows(
   import_local(here::here("data-raw/nut"), station_code = "nartsnut") %>% 
     qaqc() %>% 
@@ -35,7 +36,7 @@ raw_dat <- bind_rows(
     mutate(station = "grbgbnut"))
 ```
 
-#### Station Data Summary
+### Station Data Summary
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 total_nut <- raw_dat %>% 
   mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
@@ -67,11 +68,10 @@ knitr::kable(dat_tot)
 
 ```
 
-#### Seasonal Data Summary
+### Seasonal Data Summary {.tabset}
 
+#### ChlA summer means for all NERRS
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
-
 seasonal_nut <- raw_dat %>% 
   mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
   select(date,
@@ -92,33 +92,59 @@ seasonal_nut <- raw_dat %>%
   dplyr::filter(!chla_n == "NA") %>% 
   summarize(N_stations = length(chla_n),
             mean_seasonal = mean(chla_n), 
-            se_seasonal = sd(chla_n)/sqrt(N_stations)) 
+            st_error = sd(chla_n)/sqrt(N_stations)) %>% 
+  dplyr::rename(value = mean_seasonal) %>% 
+  dplyr::mutate(cont_year = year+0.5)
 
 seasonal_nut %>% 
-  ggplot(aes(x = year, y = mean_seasonal, group = station, color = station))+
+  ggplot(aes(x = year, y = value, group = station, color = station))+
   geom_point()+
   geom_path()+
-  geom_errorbar(aes(ymin=mean_seasonal-se_seasonal, ymax=mean_seasonal+se_seasonal), width=.2)+
+  geom_errorbar(aes(ymin=value-st_error, ymax=value+st_error), width=.2)+
   ggtitle("Chlorophyll A Summer Means for New England NERRs")
+
+```
+
+
+#### ChlA for Wells (data rich) and Waqouit (data poor)
+```{r,  echo=FALSE, message=FALSE, warning=FALSE}
 
 seasonal_nut %>% 
   dplyr::filter(!station == "nartsnut",
                 !station == "grbgbnut") %>% 
-  ggplot(aes(x = year, y = mean_seasonal))+
+  ggplot(aes(x = year, y = value))+
   geom_point()+
   geom_path()+
-  geom_errorbar(aes(ymin=mean_seasonal-se_seasonal, ymax=mean_seasonal+se_seasonal), width=.2)+
+  geom_errorbar(aes(ymin=value-st_error, ymax=value+st_error), width=.2)+
   facet_grid(rows = vars(station), scales = "free")+
   ggtitle("Chlorophyll A Summer Means for Wells (data rich) and Waquoit (data poor)")
 
+```
+
+#### Table
+```{r,  echo=FALSE, message=FALSE, warning=FALSE}
 DT::datatable(seasonal_nut)
 
 ```
 
-### GAM meta analysis
+### GAM meta analysis {.tabset}
+
+#### Wells Bay (Data Rich)
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+wel<-seasonal_nut %>% 
+  dplyr::filter(station == "welinnut")
+  
+wqtrends::anlz_gam(wel)
 
 
 ```
 
+#### Waquoit (Data Poor)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+waq<-seasonal_nut %>% 
+  dplyr::filter(station == "wqbmpnut")
+  
+wqtrends::anlz_gam(waq)
 
+
+```
