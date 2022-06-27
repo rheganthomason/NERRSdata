@@ -4,18 +4,20 @@ author: "Kimberly Bastille"
 date: "6/22/2022"
 output: html_document
 ---
+# Background
+Below is a summary of the data comparisons between the Beck et. al 2022 paper and the NERRS data. Their analysis consisted of 3 steps. 1) Ran a gam analysis on the biweekly/monthly samples to estimate a smooth temporal pattern. 2) Used the smoothed gam to get a daily timeseries. 3) Took seasonal estimate averages from the daily times series. The goal of this is to propogate uncertainty through the analysis.
 
-### Data Summary
+They used that estimates to evaluate linear trends over a moving average through different time periods (10 years). They interpreted the slope of the regression a representative for the central year in the moving avg block. <span style="color: red;">Our timeseries is only 12 years so a 4yr moving window was used to get three distinct blocks like the Beck paper</span>.
 
-Below is a summary of the data comparisons between the Beck et. al 2022 paper and the NERRS data. 
+
+# Data Summary
+
 
 | Parameter |  Beck et. al 2022 | NERRS data from stations used in Rhegan's Analysis |
 |---------------|------------------|-------------------------------------------------|
 | Time Series Length | 30 years (1990 - 2019) | 12 years (2007 - 2019) * earlier samples removed due to poor qaqc scores |
-| Number of total samples | 414 - 608 samples per station | 34 - 470 *greatest from Wells Bay |
-| Seasons available | ALL | Summer *due to ice cover summer was the season most likely to show trends with enough data |
 
-Summary tables describing data from New England NERRS stations. (welinnut = Wells Bay ME, grbgbnut = Great Bay NH, wqbmpnut = Waquoit Bay MA, nartsnut = Narragansett RI) 
+Data only presented for Wells Bay, Maine and Waquoit Bay, Massachusetts because these stations had the fewest years missing. 
 
 ```{r, echo=FALSE,  message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -36,115 +38,94 @@ raw_dat <- bind_rows(
     mutate(station = "grbgbnut"))
 ```
 
-### Station Data Summary
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-total_nut <- raw_dat %>% 
+# GAM meta analysis {.tabset}
+```{r,  echo=FALSE, message=FALSE, warning=FALSE}
+dat<- raw_dat %>% 
   mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
   select(date,
          station,
-         #po4f = po4f, 
-         #nh4f = nh4f, 
-         #no2f = no2f,
-         #no23f = no23f, 
-         chla_n = chla_n) %>% #, %>% 
-         #no3f = no3f) %>%
-  #pivot_longer(cols = c(chla_n), 
-  #             names_to = "Variable", values_to = "value") %>% 
-  dplyr::mutate(month = lubridate::month(date), 
-                year = lubridate::year(date))%>%
-  dplyr::filter(month > 5, 
-                month < 9) %>% 
-  group_by(station) %>%
-  dplyr::filter(!chla_n == "NA") %>% 
-  summarise(Number_of_Stations = length(chla_n), 
-            Years_Missing = c())
-years_missing <- data.frame(station = c("grbgbnut", "nartsnut", "welinnut", "wqbmpnut"),
-                            Years_Missing = c("2009,2010,2014,2015,2016,2017", 
-                                             "2008.2009,2010", 
-                                             "2016", 
-                                             "2014"))
-dat_tot <- total_nut %>%  left_join(years_missing)
-knitr::kable(dat_tot)
+         chla_n = chla_n) %>% 
+  dplyr::group_by(date, station) %>% 
+  dplyr::summarise(value = mean(chla_n)) %>% 
+  dplyr::mutate(param = c("chla"), 
+                doy = lubridate::yday(date), 
+                mon = lubridate::month(date, label = TRUE), 
+                yr = lubridate::year(date), 
+                cont_year = as.numeric(yr + (doy/365))) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::filter(!value == "NA")
+
 
 ```
 
-### Seasonal Data Summary {.tabset}
+## Wells Bay (Data Rich) {.tabset} 
+kts = 144 (12months * 12years) Based on Beck paper calculation
 
-#### ChlA summer means for all NERRS
+### Timeseries GAM
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-seasonal_nut <- raw_dat %>% 
-  mutate(date = format(as.Date(datetimestamp), "%Y-%m-%d")) %>% 
-  select(date,
-         station,
-         #po4f = po4f, 
-         #nh4f = nh4f, 
-         #no2f = no2f,
-         #no23f = no23f, 
-         chla_n = chla_n) %>% #, %>% 
-         #no3f = no3f) %>%
-  #pivot_longer(cols = c(chla_n), 
-  #             names_to = "Variable", values_to = "value") %>% 
-  dplyr::mutate(month = lubridate::month(date), 
-                year = lubridate::year(date))%>%
-  dplyr::filter(month > 5, 
-                month < 9) %>% 
-  group_by(station, year) %>%
-  dplyr::filter(!chla_n == "NA") %>% 
-  summarize(N_stations = length(chla_n),
-            mean_seasonal = mean(chla_n), 
-            st_error = sd(chla_n)/sqrt(N_stations)) %>% 
-  dplyr::rename(value = mean_seasonal) %>% 
-  dplyr::mutate(cont_year = year+0.5)
+wel<- dat %>% dplyr::filter(station == "welinnut")
 
-seasonal_nut %>% 
-  ggplot(aes(x = year, y = value, group = station, color = station))+
-  geom_point()+
-  geom_path()+
-  geom_errorbar(aes(ymin=value-st_error, ymax=value+st_error), width=.2)+
-  ggtitle("Chlorophyll A Summer Means for New England NERRs")
-
+wel_mod<- wqtrends::anlz_gam(wel, trans = 'log10', kts = 144)
+show_prdseries(wel_mod, ylab = "chl")
 ```
 
-
-#### ChlA for Wells (data rich) and Waqouit (data poor)
-```{r,  echo=FALSE, message=FALSE, warning=FALSE}
-
-seasonal_nut %>% 
-  dplyr::filter(!station == "nartsnut",
-                !station == "grbgbnut") %>% 
-  ggplot(aes(x = year, y = value))+
-  geom_point()+
-  geom_path()+
-  geom_errorbar(aes(ymin=value-st_error, ymax=value+st_error), width=.2)+
-  facet_grid(rows = vars(station), scales = "free")+
-  ggtitle("Chlorophyll A Summer Means for Wells (data rich) and Waquoit (data poor)")
-
-```
-
-#### Table
-```{r,  echo=FALSE, message=FALSE, warning=FALSE}
-DT::datatable(seasonal_nut)
-
-```
-
-### GAM meta analysis {.tabset}
-
-#### Wells Bay (Data Rich)
+### Monthly
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-wel<-seasonal_nut %>% 
-  dplyr::filter(station == "welinnut")
-  
-wqtrends::anlz_gam(wel)
-
-
+show_prdseason(wel_mod, ylab = "chl")
 ```
 
-#### Waquoit (Data Poor)
+### DOY
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-waq<-seasonal_nut %>% 
-  dplyr::filter(station == "wqbmpnut")
-  
-wqtrends::anlz_gam(waq)
+show_prddoy(wel_mod, "chl")
+```
+
+### Summer seasonal average with regression
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+wel_mod2<- wqtrends::anlz_gam(wel, trans = 'ident')
+show_metseason(wel_mod2, metfun = mean, doystr = 180, doyend = 270, yrstr = 2007, yrend = 2011, ylab = "chl" )
+```
 
 
+### Summer seasonal average log slopes (window = 4)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+wel_mod3<- wqtrends::anlz_gam(wel, trans = 'log10')
+show_trndseason(wel_mod3, doystr = 180, doyend = 270, 
+                ylab = "chl", justify = "center", win = 4 )
+```
+
+## Waquoit (Data Poor) {.tabset}
+kts = 84 (7months * 12years) Based on Beck paper calculation
+
+* Seasonal plots error out because too little data.
+
+### Timeseries GAM
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+waq<- dat %>% dplyr::filter(station == "wqbmpnut")
+
+waq_mod<- wqtrends::anlz_gam(waq, trans = 'log10', kts = 84)
+show_prdseries(waq_mod, ylab = "chl")
+```
+
+### Monthly
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+show_prdseason(waq_mod, ylab = "chl")
+```
+
+### DOY
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+show_prddoy(waq_mod, "chl")
+```
+
+### Summer seasonal average with regression
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+waq_mod2<- wqtrends::anlz_gam(waq, trans = 'ident')
+show_metseason(waq_mod2, metfun = mean, doystr = 180, doyend = 270, yrstr = 2007, yrend = 2011, ylab = "chl" )
+```
+
+
+### Summer seasonal average log slopes (window = 4)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+waq_mod3<- wqtrends::anlz_gam(waq, trans = 'log10')
+show_trndseason(waq_mod3, doystr = 180, doyend = 270, 
+                ylab = "chl", justify = "center", win = 4 )
 ```
